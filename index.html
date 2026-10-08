@@ -1,0 +1,2345 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<link rel="icon" type="image/png" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Funil de Vendas</title>
+  <style>
+    :root{
+      --bg:#0f1115;
+      --card:#181b22;
+      --card2:#20242e;
+      --text:#f8fafc;
+      --muted:#aeb7c4;
+      --yellow:#ffd43b;
+      --red:#ff3131;
+      --green:#00c853;
+      --blue:#33c3ff;
+      --orange:#ff9f1c;
+      --pink:#ff5c8a;
+      --shadow:0 18px 45px rgba(0,0,0,.35);
+      --radius:24px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:Inter,Arial,sans-serif;background:radial-gradient(circle at top,#232936 0%,var(--bg) 45%);color:var(--text);line-height:1.5}
+    a{color:inherit;text-decoration:none}
+    .container{width:min(1120px,92%);margin:auto}
+    .hero{min-height:92vh;display:grid;place-items:center;padding:64px 0;position:relative;overflow:hidden}
+    .hero:before{content:"";position:absolute;width:440px;height:440px;border-radius:50%;background:rgba(255,49,49,.18);filter:blur(40px);top:-80px;right:-140px}
+    .hero:after{content:"";position:absolute;width:380px;height:380px;border-radius:50%;background:rgba(0,200,83,.16);filter:blur(40px);bottom:-90px;left:-120px}
+    .hero-grid{position:relative;z-index:2;display:grid;grid-template-columns:1.1fr .9fr;gap:44px;align-items:center}
+    .badge{display:inline-flex;gap:10px;align-items:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:10px 16px;color:var(--muted);font-weight:700;margin-bottom:20px}
+    h1{font-size:clamp(2.4rem,7vw,5rem);line-height:.95;letter-spacing:-3px;margin-bottom:22px}
+    .gradient{background:linear-gradient(90deg,var(--yellow),var(--red),var(--green));-webkit-background-clip:text;background-clip:text;color:transparent}
+    .lead{font-size:clamp(1.05rem,2vw,1.35rem);color:var(--muted);max-width:640px;margin-bottom:30px}
+    .actions{display:flex;gap:14px;flex-wrap:wrap}
+    .btn{padding:15px 22px;border-radius:16px;font-weight:900;box-shadow:var(--shadow);transition:.25s transform,.25s filter}
+    .btn:hover{transform:translateY(-3px);filter:brightness(1.08)}
+    .btn-primary{background:linear-gradient(135deg,var(--red),#ff7a00);color:white}
+    .btn-secondary{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16)}
+    .funnel-card{background:linear-gradient(180deg,rgba(255,255,255,.11),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.14);border-radius:32px;padding:30px;box-shadow:var(--shadow)}
+    .funnel{display:grid;gap:10px;margin:10px 0 22px}
+    .slice{height:68px;display:grid;place-items:center;font-weight:1000;text-transform:uppercase;letter-spacing:.8px;clip-path:polygon(var(--l) 0,calc(100% - var(--l)) 0,calc(100% - var(--r)) 100%,var(--r) 100%);text-shadow:0 2px 10px rgba(0,0,0,.3)}
+    .s1{--l:0%;--r:9%;background:var(--green);border-radius:16px 16px 0 0}.s2{--l:9%;--r:18%;background:var(--yellow);color:#141414}.s3{--l:18%;--r:27%;background:var(--blue)}.s4{--l:27%;--r:36%;background:var(--red);border-radius:0 0 16px 16px}
+    .money{text-align:center;font-size:2.8rem;margin-top:14px;filter:drop-shadow(0 10px 16px rgba(0,0,0,.4))}
+    .nav{position:sticky;top:0;z-index:10;background:rgba(15,17,21,.8);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.08)}
+    .nav-inner{height:68px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .logo{font-weight:1000;font-size:1.15rem}.links{display:flex;gap:12px;flex-wrap:wrap}.links a{color:var(--muted);font-weight:800;padding:8px 10px;border-radius:12px}.links a:hover{background:rgba(255,255,255,.08);color:white}
+    section{padding:80px 0}.section-title{font-size:clamp(2rem,5vw,3.5rem);letter-spacing:-2px;margin-bottom:14px}.section-sub{color:var(--muted);font-size:1.1rem;max-width:760px;margin-bottom:32px}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:22px;box-shadow:0 10px 30px rgba(0,0,0,.22);transition:.2s transform,.2s border}.card:hover{transform:translateY(-5px);border-color:rgba(255,255,255,.2)}
+    .icon{font-size:2rem;margin-bottom:12px}.card h3{font-size:1.2rem;margin-bottom:8px}.card p{color:var(--muted);font-size:.98rem}.tag{display:inline-block;margin-top:14px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.08);color:#dbe4ef;font-size:.8rem;font-weight:800}
+    .stage{border-radius:34px;padding:34px;margin-bottom:30px;background:var(--card);border:1px solid rgba(255,255,255,.09);box-shadow:var(--shadow);position:relative;overflow:hidden}.stage:before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,rgba(255,255,255,.07),transparent 45%);pointer-events:none}.stage-head{position:relative;display:flex;align-items:center;gap:16px;margin-bottom:24px}.stage-number{width:54px;height:54px;border-radius:18px;display:grid;place-items:center;font-weight:1000;color:#101010}.stage h2{font-size:clamp(1.7rem,4vw,2.5rem)}
+    .topo .stage-number{background:var(--blue)}.meio .stage-number{background:var(--yellow)}.fundo .stage-number{background:var(--red);color:white}.fidel .stage-number{background:var(--green)}
+    .list{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.item{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:16px;font-weight:800;color:#f1f5f9}.item small{display:block;color:var(--muted);font-weight:600;margin-top:6px}.arrow{color:var(--yellow);font-weight:1000}
+    .cta{background:linear-gradient(135deg,#ff3131,#ff9f1c);border-radius:36px;padding:48px;text-align:center;box-shadow:var(--shadow)}.cta h2{font-size:clamp(2rem,5vw,3.4rem);margin-bottom:14px}.cta p{color:#fff7e8;font-size:1.15rem;margin-bottom:24px}
+    footer{padding:34px 0;color:var(--muted);text-align:center;border-top:1px solid rgba(255,255,255,.08)}
+    @media(max-width:900px){.hero-grid,.grid{grid-template-columns:1fr}.list{grid-template-columns:repeat(2,1fr)}.links{display:none}.hero{min-height:auto}.funnel-card{padding:20px}}
+    @media(max-width:560px){.list{grid-template-columns:1fr}.cta{padding:30px 20px}.stage{padding:24px 18px}.nav-inner{height:62px}.slice{height:56px}h1{letter-spacing:-1.5px}}
+
+
+    .ani-icon{width:34px;height:34px;display:inline-block;vertical-align:-9px;margin-right:8px;position:relative;animation:iconFloat 2.6s ease-in-out infinite;filter:drop-shadow(0 8px 10px rgba(0,0,0,.28));flex:0 0 auto}
+    .logo .ani-icon,.badge .ani-icon{margin-right:8px}.icon .ani-icon{width:44px;height:44px;margin:0 0 8px 0;vertical-align:middle}.money .ani-icon{width:76px;height:76px;margin:0;animation:moneyRain 1.25s ease-in-out infinite}.item .ani-icon{margin-right:10px}
+    .ani-icon:before,.ani-icon:after,.ani-icon i{content:"";position:absolute;display:block;box-sizing:border-box}
+    @keyframes iconFloat{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-5px) rotate(-3deg)}}
+    @keyframes iconPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+    @keyframes moneyRain{0%{transform:translateY(-5px) rotate(-8deg);opacity:.9}50%{transform:translateY(6px) rotate(8deg);opacity:1}100%{transform:translateY(-5px) rotate(-8deg);opacity:.9}}
+    .icon-burger:before{left:3px;top:6px;width:28px;height:14px;background:#f6b34b;border-radius:18px 18px 6px 6px}.icon-burger:after{left:4px;top:18px;width:26px;height:8px;background:#7a3d18;border-radius:8px;box-shadow:0 8px 0 #f6b34b}.icon-burger i{left:6px;top:16px;width:22px;height:5px;background:#ffdf54;clip-path:polygon(0 0,20% 100%,40% 0,60% 100%,80% 0,100% 100%,100% 0)}
+    .icon-chart:before{inset:4px;border:3px solid #33c3ff;border-top:0;border-right:0;border-radius:0 0 0 8px}.icon-chart:after{left:10px;bottom:8px;width:5px;height:11px;background:#ffd43b;box-shadow:8px -5px 0 #00c853,16px -12px 0 #ff3131;border-radius:3px}.icon-chart i{right:4px;top:5px;width:10px;height:10px;border-top:3px solid #fff;border-right:3px solid #fff;transform:rotate(45deg)}
+    .icon-money:before{left:4px;top:8px;width:26px;height:18px;background:#00c853;border-radius:5px;border:2px solid rgba(255,255,255,.75)}.icon-money:after{left:12px;top:11px;width:10px;height:10px;border-radius:50%;background:#d9ffe5}.icon-money i{right:1px;bottom:1px;width:15px;height:15px;background:#ffd43b;border-radius:50%;border:2px solid #fff}
+    .icon-cold:before{left:15px;top:3px;width:4px;height:28px;background:#9be7ff;border-radius:4px;box-shadow:0 0 12px #33c3ff}.icon-cold:after{left:3px;top:15px;width:28px;height:4px;background:#9be7ff;border-radius:4px;transform:rotate(45deg)}.icon-cold i{left:3px;top:15px;width:28px;height:4px;background:#9be7ff;border-radius:4px;transform:rotate(-45deg)}
+    .icon-fire{
+position:relative;
+filter:drop-shadow(0 0 12px rgba(255,120,0,.45));
+}
+
+.icon-fire:before{
+left:6px;
+top:1px;
+width:23px;
+height:30px;
+background:linear-gradient(180deg,#ff8a3d 0%,#ff5a00 45%,#ff3b00 100%);
+border-radius:55% 55% 45% 45%;
+clip-path:path("M16 0 C24 6 28 16 27 26 C26 34 20 40 12 39 C4 38 0 31 1 23 C2 15 8 10 10 5 C11 2 13 1 16 0 Z");
+animation:fireMove 1.3s ease-in-out infinite;
+}
+
+.icon-fire:after{
+left:11px;
+top:12px;
+width:14px;
+height:18px;
+background:linear-gradient(180deg,#ffe27a 0%,#ffb300 100%);
+clip-path:path("M9 0 C14 5 16 10 16 16 C15 21 11 24 7 24 C3 23 0 20 0 15 C0 10 4 8 5 4 C6 2 7 1 9 0 Z");
+filter:brightness(1.05);
+}
+
+@keyframes fireMove{
+0%,100%{transform:scale(1) rotate(-2deg)}
+50%{transform:scale(1.08) rotate(2deg)}
+}
+    .icon-recycle:before{inset:6px;border:4px solid #00c853;border-left-color:transparent;border-radius:50%;animation:spin 2s linear infinite}.icon-recycle:after{right:3px;top:7px;width:0;height:0;border-left:8px solid #00c853;border-top:5px solid transparent;border-bottom:5px solid transparent}.icon-recycle i{left:5px;bottom:5px;width:8px;height:8px;background:#00c853;border-radius:50%}@keyframes spin{to{transform:rotate(360deg)}}
+    .icon-megaphone:before{left:4px;top:11px;width:22px;height:14px;background:#ff3131;clip-path:polygon(0 35%,72% 0,72% 100%,0 65%)}.icon-megaphone:after{right:2px;top:9px;width:7px;height:18px;border:3px solid #ffd43b;border-left:0;border-radius:0 20px 20px 0}.icon-megaphone i{left:7px;top:22px;width:8px;height:10px;background:#fff;border-radius:0 0 5px 5px;transform:rotate(-15deg)}
+    .icon-bolt:before{left:9px;top:2px;width:18px;height:30px;background:#ffd43b;clip-path:polygon(45% 0,100% 0,62% 42%,100% 42%,30% 100%,48% 55%,0 55%);animation:iconPulse .9s infinite}.icon-target:before{inset:3px;border:4px solid #ff3131;border-radius:50%;box-shadow:inset 0 0 0 5px #fff,inset 0 0 0 10px #33c3ff}.icon-target:after{left:14px;top:14px;width:6px;height:6px;background:#ffd43b;border-radius:50%}
+    .icon-chat:before{left:4px;top:6px;width:26px;height:20px;background:#33c3ff;border-radius:10px}.icon-chat:after{left:9px;top:22px;width:10px;height:8px;background:#33c3ff;clip-path:polygon(0 0,100% 0,0 100%)}.icon-chat i{left:10px;top:15px;width:4px;height:4px;background:#fff;border-radius:50%;box-shadow:6px 0 0 #fff,12px 0 0 #fff}
+    .icon-music:before{left:10px;top:5px;width:5px;height:21px;background:#ff5c8a;border-radius:4px;box-shadow:11px 4px 0 #ff5c8a}.icon-music:after{left:4px;bottom:4px;width:12px;height:9px;background:#ff5c8a;border-radius:50%;box-shadow:12px 4px 0 #ff5c8a}.icon-music i{left:13px;top:5px;width:15px;height:5px;background:#ff5c8a;border-radius:5px}
+    .icon-leaf:before{left:7px;top:5px;width:22px;height:24px;background:#00c853;border-radius:90% 0 90% 0;transform:rotate(18deg)}.icon-leaf:after{left:16px;top:12px;width:3px;height:17px;background:#d9ffe5;transform:rotate(40deg);border-radius:4px}
+    .icon-phone:before{left:8px;top:3px;width:18px;height:28px;background:#20242e;border:3px solid #33c3ff;border-radius:7px}.icon-phone:after{left:15px;bottom:6px;width:5px;height:5px;background:#33c3ff;border-radius:50%}
+    .icon-video:before{left:4px;top:9px;width:22px;height:17px;background:#ff3131;border-radius:6px}.icon-video:after{right:2px;top:13px;width:10px;height:10px;background:#ffd43b;clip-path:polygon(0 0,100% 50%,0 100%)}
+    .icon-rocket:before{left:10px;top:4px;width:15px;height:24px;background:linear-gradient(#fff,#33c3ff);border-radius:50% 50% 35% 35%;transform:rotate(35deg)}.icon-rocket:after{left:8px;bottom:1px;width:15px;height:15px;background:#ff9f1c;border-radius:50% 0 50% 50%;transform:rotate(35deg);animation:iconPulse .7s infinite}.icon-rocket i{left:16px;top:9px;width:6px;height:6px;background:#ff3131;border-radius:50%}
+    .icon-search:before{left:5px;top:5px;width:18px;height:18px;border:4px solid #33c3ff;border-radius:50%}.icon-search:after{left:22px;top:22px;width:12px;height:4px;background:#ffd43b;border-radius:6px;transform:rotate(45deg);transform-origin:left center}
+    .icon-partner:before{left:5px;top:12px;width:15px;height:10px;background:#ffd43b;border-radius:8px;transform:rotate(-20deg)}.icon-partner:after{right:5px;top:12px;width:15px;height:10px;background:#33c3ff;border-radius:8px;transform:rotate(20deg)}.icon-partner i{left:14px;top:17px;width:8px;height:8px;background:#fff;border-radius:50%}
+    .icon-spark:before{inset:3px;background:#ffd43b;clip-path:polygon(50% 0,61% 35%,100% 50%,61% 65%,50% 100%,39% 65%,0 50%,39% 35%);animation:iconPulse 1s infinite}.icon-magnet:before{left:7px;top:6px;width:20px;height:23px;border:6px solid #ff3131;border-top:0;border-radius:0 0 15px 15px}.icon-magnet:after{left:5px;top:5px;width:8px;height:8px;background:#33c3ff;border-radius:2px;box-shadow:16px 0 0 #33c3ff}
+    .icon-gift:before{left:5px;top:12px;width:24px;height:18px;background:#ff3131;border-radius:4px}.icon-gift:after{left:15px;top:8px;width:4px;height:22px;background:#ffd43b;box-shadow:-10px 7px 0 0 transparent}.icon-gift i{left:5px;top:12px;width:24px;height:4px;background:#ffd43b}
+    .icon-star:before{left:4px;top:4px;width:26px;height:26px;background:#ffd43b;clip-path:polygon(50% 0,62% 34%,98% 35%,69% 56%,79% 91%,50% 70%,21% 91%,31% 56%,2% 35%,38% 34%);animation:iconPulse 1.2s infinite}.icon-clock:before{inset:4px;border:4px solid #fff;border-radius:50%;background:#20242e}.icon-clock:after{left:16px;top:8px;width:3px;height:11px;background:#ffd43b;border-radius:4px;transform-origin:bottom;animation:spin 3s linear infinite}.icon-clock i{left:16px;top:16px;width:9px;height:3px;background:#ff3131;border-radius:4px;transform-origin:left center;animation:spin 6s linear infinite}
+    .icon-card:before{left:4px;top:8px;width:26px;height:18px;background:#33c3ff;border-radius:5px}.icon-card:after{left:4px;top:13px;width:26px;height:5px;background:#20242e}.icon-card i{left:9px;top:21px;width:10px;height:2px;background:#fff;border-radius:2px}.icon-list:before{left:5px;top:7px;width:24px;height:5px;background:#ffd43b;border-radius:5px;box-shadow:0 9px 0 #33c3ff,0 18px 0 #ff3131}.icon-list:after{left:0;top:8px;width:3px;height:3px;background:#fff;border-radius:50%;box-shadow:0 9px 0 #fff,0 18px 0 #fff}.icon-feedback:before{left:8px;top:5px;width:18px;height:24px;background:#fff;border-radius:4px}.icon-feedback:after{left:11px;top:11px;width:12px;height:3px;background:#33c3ff;box-shadow:0 6px 0 #ffd43b,0 12px 0 #00c853;border-radius:3px}.icon-game:before{left:3px;top:11px;width:28px;height:16px;background:#20242e;border:3px solid #ff5c8a;border-radius:12px}.icon-game:after{left:9px;top:17px;width:8px;height:3px;background:#fff;box-shadow:2px -2px 0 #fff,2px 2px 0 #fff}.icon-game i{right:9px;top:17px;width:5px;height:5px;background:#ffd43b;border-radius:50%;box-shadow:6px 0 0 #33c3ff}.icon-trophy:before{left:9px;top:5px;width:16px;height:17px;background:#ffd43b;border-radius:3px 3px 10px 10px}.icon-trophy:after{left:6px;top:8px;width:22px;height:9px;border:3px solid #ffd43b;border-top:0;border-radius:0 0 12px 12px}.icon-trophy i{left:13px;top:21px;width:8px;height:9px;background:#ffd43b;box-shadow:-5px 8px 0 #ffd43b,5px 8px 0 #ffd43b}.icon-dice:before{left:6px;top:6px;width:22px;height:22px;background:#fff;border-radius:6px;transform:rotate(8deg)}.icon-dice:after{left:11px;top:11px;width:5px;height:5px;background:#20242e;border-radius:50%;box-shadow:8px 0 0 #20242e,4px 8px 0 #20242e,0 16px 0 #20242e,8px 16px 0 #20242e}.icon-heart:before{left:8px;top:10px;width:18px;height:18px;background:#00c853;transform:rotate(45deg);border-radius:4px}.icon-heart:after{left:8px;top:5px;width:11px;height:11px;background:#00c853;border-radius:50%;box-shadow:8px 0 0 #00c853}.icon-click:before{left:11px;top:4px;width:6px;height:20px;background:#fff;border-radius:6px}.icon-click:after{left:15px;top:13px;width:11px;height:15px;background:#ffd43b;border-radius:8px 8px 5px 5px;transform:rotate(-15deg)}
+
+  </style>
+
+<style id="stage-color-upgrade">
+/* ===== COLOR SYSTEM ===== */
+
+.topo{
+background:linear-gradient(135deg,rgba(51,195,255,.18),rgba(51,195,255,.06)) !important;
+border:2px solid rgba(51,195,255,.45) !important;
+box-shadow:0 0 35px rgba(51,195,255,.18) !important;
+}
+
+.meio{
+background:linear-gradient(135deg,rgba(255,212,59,.16),rgba(255,212,59,.05)) !important;
+border:2px solid rgba(255,212,59,.45) !important;
+box-shadow:0 0 35px rgba(255,212,59,.14) !important;
+}
+
+.fundo{
+background:linear-gradient(135deg,rgba(255,49,49,.16),rgba(255,49,49,.05)) !important;
+border:2px solid rgba(255,49,49,.45) !important;
+box-shadow:0 0 35px rgba(255,49,49,.14) !important;
+}
+
+.fidel{
+background:linear-gradient(135deg,rgba(0,200,83,.16),rgba(0,200,83,.05)) !important;
+border:2px solid rgba(0,200,83,.45) !important;
+box-shadow:0 0 35px rgba(0,200,83,.14) !important;
+}
+
+/* TITLES */
+
+.topo h2{color:#7ddcff !important;}
+.meio h2{color:#ffe15c !important;}
+.fundo h2{color:#ff7b7b !important;}
+.fidel h2{color:#59ff9d !important;}
+
+/* FUNNEL COLORS */
+
+.s1{
+background:linear-gradient(135deg,#66d9ff,#33c3ff) !important;
+}
+
+.s2{
+background:linear-gradient(135deg,#ffe15c,#ffd43b) !important;
+}
+
+.s3{
+background:linear-gradient(135deg,#ff5c5c,#ff3131) !important;
+}
+
+.s4{
+background:linear-gradient(135deg,#36e47c,#00c853) !important;
+}
+
+/* TAG COLORS */
+
+.topo .tag{
+background:rgba(51,195,255,.18) !important;
+border:1px solid rgba(51,195,255,.4);
+}
+
+.meio .tag{
+background:rgba(255,212,59,.18) !important;
+border:1px solid rgba(255,212,59,.4);
+}
+
+.fundo .tag{
+background:rgba(255,49,49,.18) !important;
+border:1px solid rgba(255,49,49,.4);
+}
+
+.fidel .tag{
+background:rgba(0,200,83,.18) !important;
+border:1px solid rgba(0,200,83,.4);
+}
+
+/* BUTTON */
+
+.btn-primary{
+background:linear-gradient(135deg,#33c3ff,#008cff) !important;
+}
+
+/* HERO GLOW */
+
+.hero:before{
+background:rgba(51,195,255,.16) !important;
+}
+
+.hero:after{
+background:rgba(0,200,83,.12) !important;
+}
+</style>
+
+
+<style id="mini-funnel-animation-upgrade">
+/* ===== MINI FUNIL ANIMADO: 1 MIL VIEWS -> +1 VENDA ===== */
+.mini-funnel-demo{
+  width:min(1120px,92%);
+  margin:44px auto 0;
+  padding:28px;
+  border-radius:34px;
+  background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04));
+  border:1px solid rgba(255,255,255,.13);
+  box-shadow:var(--shadow);
+  position:relative;
+  overflow:hidden;
+}
+
+.mini-funnel-demo:before{
+  content:"";
+  position:absolute;
+  width:260px;
+  height:260px;
+  border-radius:50%;
+  background:rgba(51,195,255,.13);
+  filter:blur(35px);
+  top:-110px;
+  left:-90px;
+}
+
+.mini-funnel-demo:after{
+  content:"";
+  position:absolute;
+  width:260px;
+  height:260px;
+  border-radius:50%;
+  background:rgba(0,200,83,.13);
+  filter:blur(35px);
+  right:-90px;
+  bottom:-110px;
+}
+
+.mini-funnel-title{
+  position:relative;
+  z-index:2;
+  font-size:clamp(1.4rem,3vw,2.2rem);
+  letter-spacing:-1px;
+  margin-bottom:8px;
+}
+
+.mini-funnel-sub{
+  position:relative;
+  z-index:2;
+  color:var(--muted);
+  margin-bottom:24px;
+  max-width:760px;
+}
+
+.mini-funnel-stage{
+  position:relative;
+  z-index:2;
+  min-height:390px;
+  display:grid;
+  place-items:center;
+}
+
+.mini-funnel-shape{
+  width:min(520px,100%);
+  display:grid;
+  gap:8px;
+  filter:drop-shadow(0 22px 35px rgba(0,0,0,.30));
+}
+
+.mini-slice{
+  height:74px;
+  display:grid;
+  place-items:center;
+  font-weight:1000;
+  text-transform:uppercase;
+  letter-spacing:.8px;
+  text-shadow:0 2px 10px rgba(0,0,0,.25);
+  clip-path:polygon(var(--l) 0,calc(100% - var(--l)) 0,calc(100% - var(--r)) 100%,var(--r) 100%);
+}
+
+.mini-top{
+  --l:0%;
+  --r:10%;
+  background:linear-gradient(135deg,#75ddff,#33c3ff);
+  border-radius:18px 18px 0 0;
+}
+
+.mini-mid{
+  --l:10%;
+  --r:22%;
+  background:linear-gradient(135deg,#ffe15c,#ffd43b);
+  color:#151515;
+}
+
+.mini-bottom{
+  --l:22%;
+  --r:34%;
+  background:linear-gradient(135deg,#ff6767,#ff3131);
+  border-radius:0 0 18px 18px;
+}
+
+.video-chip,.sale-chip{
+  position:absolute;
+  z-index:5;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:132px;
+  padding:12px 16px;
+  border-radius:999px;
+  font-weight:1000;
+  box-shadow:0 15px 30px rgba(0,0,0,.35);
+  animation-duration:5.6s;
+  animation-iteration-count:infinite;
+  animation-timing-function:ease-in-out;
+}
+
+.video-chip{
+  top:14px;
+  left:50%;
+  transform:translateX(-50%);
+  background:linear-gradient(135deg,#ffffff,#dff6ff);
+  color:#10151f;
+  border:2px solid rgba(51,195,255,.8);
+  animation-name:videoIntoFunnel;
+}
+
+.sale-chip{
+  bottom:10px;
+  left:50%;
+  opacity:0;
+  transform:translateX(-50%) scale(.7);
+  background:linear-gradient(135deg,#59ff9d,#00c853);
+  color:#07140c;
+  border:2px solid rgba(255,255,255,.75);
+  animation-name:saleOutFunnel;
+}
+
+
+.phone-views-css{
+  width:22px;
+  height:34px;
+  border:3px solid #33c3ff;
+  border-radius:8px;
+  margin-right:10px;
+  position:relative;
+  flex:0 0 auto;
+  background:linear-gradient(180deg,#18202c,#0e131b);
+  box-shadow:0 0 18px rgba(51,195,255,.35);
+}
+
+.phone-views-css:before{
+  content:"";
+  position:absolute;
+  left:4px;
+  top:5px;
+  width:10px;
+  height:16px;
+  border-radius:3px;
+  background:linear-gradient(180deg,#7de3ff,#33c3ff);
+}
+
+.phone-views-css:after{
+  content:"";
+  position:absolute;
+  left:7px;
+  bottom:3px;
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background:#33c3ff;
+}
+
+.coin-sale-css{
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  margin-right:10px;
+  position:relative;
+  flex:0 0 auto;
+  background:radial-gradient(circle at 30% 30%,#fff6b3,#ffd43b 60%,#ffb300);
+  border:3px solid #fff4b0;
+  box-shadow:
+    0 0 16px rgba(255,212,59,.45),
+    inset 0 -3px 0 rgba(0,0,0,.15);
+  animation:coinSpin 1.6s infinite ease-in-out;
+}
+
+.coin-sale-css:before{
+  content:"$";
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  font-size:14px;
+  font-weight:1000;
+  color:#8a5a00;
+}
+
+@keyframes coinSpin{
+  0%,100%{transform:rotateY(0deg) scale(1)}
+  50%{transform:rotateY(180deg) scale(1.08)}
+}
+
+.video-camera-css{
+
+  width:25px;
+  height:17px;
+  background:#ff3131;
+  border-radius:5px;
+  margin-right:9px;
+  position:relative;
+  flex:0 0 auto;
+  box-shadow:inset 0 -3px 0 rgba(0,0,0,.16);
+}
+
+.video-camera-css:after{
+  content:"";
+  position:absolute;
+  right:-9px;
+  top:4px;
+  width:11px;
+  height:9px;
+  background:#ff3131;
+  clip-path:polygon(0 0,100% 50%,0 100%);
+}
+
+.sale-dot-css{
+  width:24px;
+  height:24px;
+  border-radius:50%;
+  margin-right:9px;
+  background:#ffd43b;
+  border:3px solid #fff;
+  position:relative;
+  flex:0 0 auto;
+}
+
+.sale-dot-css:before{
+  content:"";
+  position:absolute;
+  left:7px;
+  top:3px;
+  width:6px;
+  height:13px;
+  border-right:3px solid #0b3d1d;
+  border-bottom:3px solid #0b3d1d;
+  transform:rotate(38deg);
+}
+
+.flow-line{
+  position:absolute;
+  top:54px;
+  left:50%;
+  width:4px;
+  height:285px;
+  transform:translateX(-50%);
+  background:linear-gradient(to bottom,#33c3ff,#ffd43b,#ff3131,#00c853);
+  border-radius:999px;
+  opacity:.45;
+  box-shadow:0 0 18px rgba(255,255,255,.22);
+}
+
+.flow-pulse{
+  position:absolute;
+  top:70px;
+  left:50%;
+  width:16px;
+  height:16px;
+  border-radius:50%;
+  transform:translateX(-50%);
+  background:#fff;
+  box-shadow:0 0 22px rgba(255,255,255,.95);
+  animation:flowPulseDown 5.6s infinite ease-in-out;
+}
+
+@keyframes videoIntoFunnel{
+  0%{top:14px;opacity:1;transform:translateX(-50%) scale(1)}
+  22%{top:86px;opacity:1;transform:translateX(-50%) scale(.95)}
+  45%{top:165px;opacity:1;transform:translateX(-50%) scale(.88)}
+  67%{top:245px;opacity:.88;transform:translateX(-50%) scale(.78)}
+  78%{top:295px;opacity:0;transform:translateX(-50%) scale(.55)}
+  100%{top:14px;opacity:1;transform:translateX(-50%) scale(1)}
+}
+
+@keyframes saleOutFunnel{
+  0%,64%{opacity:0;bottom:16px;transform:translateX(-50%) scale(.65)}
+  76%{opacity:1;bottom:30px;transform:translateX(-50%) scale(1.08)}
+  88%{opacity:1;bottom:48px;transform:translateX(-50%) scale(1)}
+  100%{opacity:0;bottom:72px;transform:translateX(-50%) scale(.9)}
+}
+
+@keyframes flowPulseDown{
+  0%{top:64px;background:#33c3ff}
+  35%{top:145px;background:#ffd43b}
+  65%{top:228px;background:#ff3131}
+  82%{top:314px;background:#00c853}
+  100%{top:64px;background:#33c3ff}
+}
+
+@media(max-width:560px){
+  .mini-funnel-demo{padding:22px 16px}
+  .mini-funnel-stage{min-height:360px}
+  .mini-slice{height:66px;font-size:.88rem}
+  .video-chip,.sale-chip{min-width:116px;font-size:.88rem;padding:10px 12px}
+}
+</style>
+
+
+<style id="overview-color-system-upgrade">
+/* ===== SISTEMA DE CORES NO PAINEL VISÃO GERAL ===== */
+.grid .card{
+  position:relative;
+  overflow:hidden;
+}
+
+.grid .card:before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:6px;
+  border-radius:24px 24px 0 0;
+}
+
+.grid .card:nth-child(1){
+  border-color:rgba(51,195,255,.38);
+  box-shadow:0 14px 32px rgba(51,195,255,.10);
+}
+
+.grid .card:nth-child(1):before{
+  background:linear-gradient(90deg,#66d9ff,#33c3ff);
+}
+
+.grid .card:nth-child(1) .tag{
+  background:rgba(51,195,255,.18);
+  border:1px solid rgba(51,195,255,.45);
+  color:#bfefff;
+}
+
+.grid .card:nth-child(2){
+  border-color:rgba(255,212,59,.38);
+  box-shadow:0 14px 32px rgba(255,212,59,.10);
+}
+
+.grid .card:nth-child(2):before{
+  background:linear-gradient(90deg,#ffe15c,#ffd43b);
+}
+
+.grid .card:nth-child(2) .tag{
+  background:rgba(255,212,59,.18);
+  border:1px solid rgba(255,212,59,.45);
+  color:#ffe98a;
+}
+
+.grid .card:nth-child(3){
+  border-color:rgba(0,200,83,.38);
+  box-shadow:0 14px 32px rgba(0,200,83,.10);
+}
+
+.grid .card:nth-child(3):before{
+  background:linear-gradient(90deg,#59ff9d,#00c853);
+}
+
+.grid .card:nth-child(3) .tag{
+  background:rgba(0,200,83,.18);
+  border:1px solid rgba(0,200,83,.45);
+  color:#9fffc4;
+}
+
+.overview-color-bar{
+  width:min(1120px,92%);
+  margin:28px auto 0;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+}
+
+.overview-color-pill{
+  padding:13px 12px;
+  border-radius:18px;
+  font-weight:1000;
+  text-align:center;
+  box-shadow:0 12px 25px rgba(0,0,0,.18);
+  font-size:.92rem;
+}
+
+.overview-color-pill.blue{
+  background:linear-gradient(135deg,#66d9ff,#33c3ff);
+  color:#07141b;
+}
+
+.overview-color-pill.yellow{
+  background:linear-gradient(135deg,#ffe15c,#ffd43b);
+  color:#191400;
+}
+
+.overview-color-pill.red{
+  background:linear-gradient(135deg,#ff6767,#ff3131);
+  color:white;
+}
+
+.overview-color-pill.green{
+  background:linear-gradient(135deg,#59ff9d,#00c853);
+  color:#06150b;
+}
+
+@media(max-width:700px){
+  .overview-color-bar{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+</style>
+
+
+<style id="header-logo-upgrade">
+.header-brand-logo{
+  width:42px;
+  height:42px;
+  object-fit:contain;
+  display:inline-block;
+  vertical-align:middle;
+  margin-right:10px;
+  filter:drop-shadow(0 6px 12px rgba(0,0,0,.35));
+  animation:iconFloat 2.6s ease-in-out infinite;
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:0;
+}
+</style>
+
+
+<style id="black-header-upgrade">
+.nav{
+  background:#000000 !important;
+  border-bottom:1px solid rgba(255,255,255,.08) !important;
+  backdrop-filter:none !important;
+}
+
+.nav-inner{
+  background:#000000 !important;
+}
+
+.logo{
+  color:#ffffff !important;
+}
+</style>
+
+
+<style id="practice-plan-panel-upgrade">
+.practice-panel{
+  background:linear-gradient(135deg,rgba(51,195,255,.18),rgba(255,212,59,.14),rgba(255,49,49,.15),rgba(0,200,83,.16));
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:36px;
+  padding:42px;
+  box-shadow:var(--shadow);
+  position:relative;
+  overflow:hidden;
+}
+
+.practice-panel:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:radial-gradient(circle at top left,rgba(255,255,255,.16),transparent 35%);
+  pointer-events:none;
+}
+
+.practice-panel h2{
+  position:relative;
+  font-size:clamp(2rem,5vw,3.2rem);
+  margin-bottom:14px;
+  letter-spacing:-1px;
+}
+
+.practice-panel p{
+  position:relative;
+  color:#e9eef7;
+  font-size:1.05rem;
+  margin-bottom:22px;
+  max-width:900px;
+}
+
+.practice-examples{
+  position:relative;
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
+}
+
+.practice-card{
+  background:rgba(0,0,0,.24);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:22px;
+  padding:18px;
+}
+
+.practice-card strong{
+  display:block;
+  font-size:1.05rem;
+  margin-bottom:8px;
+}
+
+.practice-card small{
+  display:block;
+  color:#cfd7e6;
+  font-size:.95rem;
+  line-height:1.45;
+}
+
+.practice-card.topo{border-color:rgba(51,195,255,.45)}
+.practice-card.meio{border-color:rgba(255,212,59,.45)}
+.practice-card.fundo{border-color:rgba(255,49,49,.45)}
+.practice-card.fidel{border-color:rgba(0,200,83,.45)}
+
+@media(max-width:760px){
+  .practice-panel{padding:28px 22px}
+  .practice-examples{grid-template-columns:1fr}
+}
+</style>
+
+
+<style id="daily-practice-rotation-upgrade">
+.daily-proof{
+  position:relative;
+  margin:0 0 20px;
+  padding:14px 16px;
+  border-radius:18px;
+  background:rgba(0,0,0,.22);
+  border:1px solid rgba(255,255,255,.14);
+  color:#f8fafc;
+  font-weight:900;
+}
+
+.daily-proof small{
+  display:block;
+  color:#cfd7e6;
+  font-weight:700;
+  margin-top:4px;
+}
+
+.daily-tip{
+  color:#ffffff;
+}
+</style>
+
+
+
+
+
+
+
+
+
+
+<style id="daily-viral-idea-panel-upgrade">
+.daily-viral-panel{
+  width:min(1120px,92%);
+  margin:0 auto 70px;
+  padding:38px;
+  border-radius:36px;
+  background:
+    radial-gradient(circle at top left,rgba(255,212,59,.18),transparent 34%),
+    radial-gradient(circle at bottom right,rgba(0,200,83,.16),transparent 36%),
+    linear-gradient(135deg,rgba(255,255,255,.10),rgba(255,255,255,.04));
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:var(--shadow);
+  position:relative;
+  overflow:hidden;
+}
+
+.daily-viral-panel:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(120deg,rgba(255,255,255,.08),transparent 45%);
+  pointer-events:none;
+}
+
+.daily-viral-panel h2{
+  position:relative;
+  font-size:clamp(2rem,5vw,3.25rem);
+  letter-spacing:-1.5px;
+  margin-bottom:12px;
+}
+
+.daily-viral-panel p{
+  position:relative;
+  color:var(--muted);
+  max-width:850px;
+  margin-bottom:22px;
+  font-size:1.05rem;
+}
+
+.daily-viral-card{
+  position:relative;
+  background:rgba(0,0,0,.25);
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:28px;
+  padding:24px;
+}
+
+.daily-viral-tag{
+  display:inline-flex;
+  align-items:center;
+  padding:8px 12px;
+  border-radius:999px;
+  background:linear-gradient(135deg,#ff3131,#ff9f1c);
+  color:white;
+  font-weight:1000;
+  margin-bottom:14px;
+  font-size:.84rem;
+}
+
+.daily-viral-card h3{
+  font-size:clamp(1.45rem,3vw,2.25rem);
+  margin-bottom:12px;
+}
+
+.daily-viral-card small{
+  display:block;
+  color:#dbe4ef;
+  line-height:1.55;
+  font-size:1rem;
+}
+
+.daily-viral-lesson{
+  margin-top:16px;
+  padding:15px 16px;
+  border-radius:18px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);
+  color:#f8fafc;
+  font-weight:800;
+}
+
+.daily-viral-actions{
+  position:relative;
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:18px;
+}
+
+.daily-viral-actions button{
+  border:0;
+  border-radius:16px;
+  padding:14px 18px;
+  font-weight:1000;
+  cursor:pointer;
+  background:linear-gradient(135deg,#ffe15c,#ff9f1c);
+  color:#151515;
+  box-shadow:0 12px 24px rgba(0,0,0,.24);
+}
+
+.daily-viral-date{
+  color:#cfd7e6;
+  font-size:.92rem;
+  margin-top:12px;
+}
+
+@media(max-width:760px){
+  .daily-viral-panel{padding:28px 18px}
+}
+</style>
+
+
+<style id="real-action-modal-upgrade">
+.real-action-modal{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:22px;
+  background:rgba(0,0,0,.72);
+  backdrop-filter:blur(10px);
+}
+
+.real-action-modal.active{
+  display:flex;
+}
+
+.real-action-box{
+  width:min(620px,94vw);
+  max-height:82vh;
+  overflow:auto;
+  border-radius:30px;
+  background:linear-gradient(180deg,#20242e,#11151d);
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 24px 60px rgba(0,0,0,.55);
+  padding:26px;
+  position:relative;
+}
+
+.real-action-close{
+  position:absolute;
+  top:16px;
+  right:16px;
+  width:42px;
+  height:42px;
+  border:0;
+  border-radius:14px;
+  background:rgba(255,255,255,.10);
+  color:white;
+  font-size:1.4rem;
+  font-weight:1000;
+  cursor:pointer;
+}
+
+.real-action-stage{
+  display:inline-block;
+  padding:7px 11px;
+  border-radius:999px;
+  background:linear-gradient(135deg,#33c3ff,#00c853);
+  color:#061015;
+  font-weight:1000;
+  margin-bottom:12px;
+  font-size:.82rem;
+}
+
+.real-action-box h3{
+  font-size:clamp(1.55rem,4vw,2.35rem);
+  margin:0 48px 12px 0;
+  letter-spacing:-1px;
+}
+
+.real-action-box p{
+  color:#cfd7e6;
+  margin-bottom:14px;
+  line-height:1.55;
+}
+
+.real-action-example{
+  padding:15px;
+  border-radius:18px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);
+  color:#f8fafc;
+  font-weight:800;
+}
+
+.real-action-tip{
+  margin-top:14px;
+  padding:15px;
+  border-radius:18px;
+  background:rgba(255,212,59,.12);
+  border:1px solid rgba(255,212,59,.22);
+  color:#fff4bf;
+}
+
+.item{
+  cursor:pointer;
+}
+</style>
+
+
+<style id="company-profile-upgrade">
+.menu-toggle{width:44px;height:44px;border:1px solid rgba(255,255,255,.14);border-radius:14px;background:rgba(255,255,255,.08);color:#fff;font-size:1.45rem;font-weight:900;cursor:pointer;margin-right:10px}
+.company-overlay{position:fixed;inset:0;background:rgba(0,0,0,.58);backdrop-filter:blur(6px);z-index:10000;opacity:0;pointer-events:none;transition:.25s}
+.company-overlay.active{opacity:1;pointer-events:auto}
+.company-sidebar{position:fixed;z-index:10001;top:0;right:0;left:auto;width:min(360px,90vw);height:100dvh;background:linear-gradient(180deg,#171b23,#0d1016);border-left:1px solid rgba(255,255,255,.12);border-right:0;box-shadow:-18px 0 50px rgba(0,0,0,.45);transform:translateX(105%);transition:.3s ease;padding:22px;overflow:auto}
+.company-sidebar.active{transform:translateX(0)}
+.company-menu-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}.company-menu-head h2{font-size:1.45rem}.company-close{width:40px;height:40px;border:0;border-radius:12px;background:rgba(255,255,255,.09);color:#fff;font-size:1.35rem;cursor:pointer}
+.company-menu-item{width:100%;display:flex;align-items:center;gap:13px;padding:15px;border:1px solid rgba(255,255,255,.1);border-radius:18px;background:rgba(255,255,255,.06);color:#fff;font-weight:900;font-size:1rem;cursor:pointer}.company-menu-icon{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#33c3ff,#008cff);display:grid;place-items:center;font-size:1.1rem}
+.company-profile-panel{display:none;margin-top:16px;padding:18px;border-radius:22px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.1)}.company-profile-panel.active{display:block}.company-avatar-wrap{display:grid;place-items:center;margin:4px 0 18px}.company-avatar{width:104px;height:104px;border-radius:24px;object-fit:cover;background:#222;border:2px solid rgba(255,255,255,.18);box-shadow:0 12px 28px rgba(0,0,0,.3)}
+.company-photo-btn{margin-top:10px;border:0;border-radius:12px;padding:10px 14px;background:rgba(51,195,255,.14);color:#9fe7ff;font-weight:900;cursor:pointer}.company-profile-panel label{display:block;color:#cfd7e6;font-size:.88rem;font-weight:800;margin:0 0 7px}.company-name-input{width:100%;border:1px solid rgba(255,255,255,.14);background:#0d1118;color:#fff;border-radius:14px;padding:14px;font-size:1rem;outline:none}.company-save{width:100%;margin-top:14px;border:0;border-radius:15px;padding:14px;background:linear-gradient(135deg,#00c853,#00a845);color:#041109;font-weight:1000;font-size:1rem;cursor:pointer}.company-saved{display:none;text-align:center;color:#76ffa9;font-weight:800;font-size:.88rem;margin-top:10px}
+@media(max-width:560px){.nav-inner{gap:8px}.menu-toggle{width:40px;height:40px;margin-right:2px}.logo{font-size:.88rem}.header-brand-logo{width:36px;height:36px}}
+
+/* v2: cabeçalho centralizado + menu à direita */
+.nav-inner{position:relative;justify-content:center!important;min-height:72px}
+.nav-inner .logo{position:absolute;left:50%;transform:translateX(-50%);justify-content:center;text-align:center;max-width:calc(100% - 140px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:1.05rem}
+.nav-inner .logo .header-brand-logo{width:38px;height:38px;border-radius:10px;margin-right:9px;flex:0 0 auto}
+.nav-inner .links{position:absolute;left:0}
+.nav-inner .menu-toggle{position:absolute;right:0;margin:0}
+.welcome-company{position:absolute;z-index:3;top:22px;left:50%;transform:translateX(-50%);width:min(1120px,92%);text-align:center;color:#cfd7e6;font-size:1rem;font-weight:700;letter-spacing:.1px}
+.welcome-company strong{color:#fff}
+@media(max-width:900px){.nav-inner .links{display:none}.nav-inner .logo{max-width:calc(100% - 76px);font-size:.98rem}.nav-inner .menu-toggle{right:0}.welcome-company{top:20px}}
+@media(max-width:560px){.nav-inner{height:70px!important}.nav-inner .logo{font-size:.92rem;max-width:calc(100% - 72px)}.nav-inner .logo .header-brand-logo{width:34px;height:34px;margin-right:7px}.menu-toggle{width:42px;height:42px}.welcome-company{top:18px;font-size:.9rem}}
+</style>
+
+<style id="profile-icon-v3">
+.company-menu-icon.profile-ani-icon{
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(135deg,rgba(51,195,255,.24),rgba(0,140,255,.10));
+  border:1px solid rgba(51,195,255,.55);
+  box-shadow:0 8px 18px rgba(0,140,255,.20);
+  animation:iconFloat 2.6s ease-in-out infinite;
+}
+.company-menu-icon.profile-ani-icon:before{
+  content:"";
+  position:absolute;
+  width:11px;
+  height:11px;
+  left:50%;
+  top:7px;
+  transform:translateX(-50%);
+  border-radius:50%;
+  background:#f8fafc;
+  box-shadow:0 0 9px rgba(255,255,255,.25);
+}
+.company-menu-icon.profile-ani-icon:after{
+  content:"";
+  position:absolute;
+  width:22px;
+  height:14px;
+  left:50%;
+  bottom:5px;
+  transform:translateX(-50%);
+  border-radius:14px 14px 8px 8px;
+  background:linear-gradient(180deg,#7ddcff,#33c3ff);
+}
+.company-menu-icon.profile-ani-icon i{
+  position:absolute;
+  width:28px;
+  height:28px;
+  inset:4px;
+  border:2px solid rgba(255,255,255,.18);
+  border-radius:10px;
+  animation:profileGlow 1.8s ease-in-out infinite;
+}
+@keyframes profileGlow{
+  0%,100%{opacity:.35;transform:scale(.94)}
+  50%{opacity:.85;transform:scale(1)}
+}
+.welcome-company{
+  line-height:1.35;
+}
+</style>
+
+
+<style id="viral-menu-v4">
+.bulb-ani-icon{
+  position:relative;
+  overflow:visible !important;
+  background:linear-gradient(135deg,rgba(255,212,59,.20),rgba(255,159,28,.10)) !important;
+  border:1px solid rgba(255,212,59,.55) !important;
+  box-shadow:0 8px 20px rgba(255,180,0,.16) !important;
+  animation:iconFloat 2.6s ease-in-out infinite;
+}
+.bulb-ani-icon:before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:6px;
+  width:18px;
+  height:19px;
+  transform:translateX(-50%);
+  border-radius:50% 50% 45% 45%;
+  background:linear-gradient(180deg,#fff49a,#ffd43b);
+  box-shadow:0 0 14px rgba(255,212,59,.62);
+  animation:bulbPulse 1.5s ease-in-out infinite;
+}
+.bulb-ani-icon:after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:25px;
+  width:11px;
+  height:7px;
+  transform:translateX(-50%);
+  border-radius:2px 2px 5px 5px;
+  background:#f8fafc;
+  box-shadow:0 3px 0 #aeb7c4;
+}
+.bulb-ani-icon i:before,.bulb-ani-icon i:after{
+  content:"";
+  position:absolute;
+  top:3px;
+  width:7px;
+  height:2px;
+  border-radius:4px;
+  background:#ffd43b;
+  box-shadow:0 0 7px rgba(255,212,59,.65);
+}
+.bulb-ani-icon i:before{left:-3px;transform:rotate(35deg)}
+.bulb-ani-icon i:after{right:-3px;transform:rotate(-35deg)}
+@keyframes bulbPulse{
+  0%,100%{filter:brightness(1);transform:translateX(-50%) scale(1)}
+  50%{filter:brightness(1.18);transform:translateX(-50%) scale(1.07)}
+}
+#ideia-viral-do-dia{scroll-margin-top:90px}
+</style>
+
+
+<style id="challenge-and-scroll-fix-v5">
+#ideia-viral-do-dia,#desafio-do-dia{scroll-margin-top:88px}
+.challenge-ani-icon{position:relative;background:linear-gradient(135deg,rgba(255,49,49,.20),rgba(255,159,28,.12))!important;border:1px solid rgba(255,100,60,.55)!important;animation:iconFloat 2.6s ease-in-out infinite}
+.challenge-ani-icon:before{content:"";position:absolute;left:8px;top:7px;width:23px;height:23px;border:3px solid #ff5c5c;border-radius:50%;box-shadow:inset 0 0 0 4px #151922,inset 0 0 0 7px #ffd43b}
+.challenge-ani-icon:after{content:"";position:absolute;left:17px;top:16px;width:7px;height:7px;background:#fff;border-radius:50%;animation:iconPulse 1s infinite}
+.challenge-ani-icon i{position:absolute;right:4px;top:3px;width:12px;height:4px;background:#ffd43b;border-radius:5px;transform:rotate(-38deg)}
+.daily-challenge-panel{width:min(1120px,92%);margin:0 auto 70px;padding:38px;border-radius:36px;background:radial-gradient(circle at top right,rgba(255,49,49,.17),transparent 34%),linear-gradient(135deg,rgba(255,255,255,.10),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.14);box-shadow:var(--shadow)}
+.daily-challenge-kicker{display:inline-block;padding:7px 11px;border-radius:999px;background:linear-gradient(135deg,#ff3131,#ff9f1c);font-size:.8rem;font-weight:1000;margin-bottom:12px}
+.daily-challenge-panel h2{font-size:clamp(2rem,5vw,3.25rem);margin-bottom:8px}
+.daily-challenge-panel>p{color:var(--muted);max-width:760px;margin-bottom:20px}
+.daily-challenge-card{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center;background:rgba(0,0,0,.24);border:1px solid rgba(255,255,255,.13);border-radius:26px;padding:22px}
+.daily-challenge-icon{width:58px;height:58px;border-radius:18px;position:relative;background:linear-gradient(135deg,#ff3131,#ff9f1c);box-shadow:0 12px 26px rgba(255,49,49,.20)}
+.daily-challenge-icon:before{content:"";position:absolute;inset:12px;border:4px solid white;border-radius:50%}
+.daily-challenge-icon:after{content:"";position:absolute;width:8px;height:8px;border-radius:50%;background:#ffd43b;left:25px;top:25px}
+.daily-challenge-card h3{font-size:1.35rem;margin-bottom:6px}.daily-challenge-card small{display:block;color:#dbe4ef;font-size:1rem;line-height:1.5}
+.daily-challenge-goal{margin-top:12px;padding:11px 13px;border-radius:14px;background:rgba(255,212,59,.10);color:#ffe98a;font-weight:800}
+.daily-challenge-btn{margin-top:16px;border:0;border-radius:16px;padding:13px 18px;font-weight:1000;cursor:pointer;background:linear-gradient(135deg,#ffe15c,#ff9f1c);color:#151515}
+@media(max-width:560px){.daily-challenge-panel{padding:27px 18px}.daily-challenge-card{grid-template-columns:1fr}.daily-challenge-icon{width:52px;height:52px}}
+</style>
+
+
+<style id="navigation-stability-v6">
+html,body{max-width:100%;overflow-x:hidden}
+.company-sidebar{box-sizing:border-box;will-change:transform}
+.company-overlay{will-change:opacity}
+#ideia-viral-do-dia,#desafio-do-dia{position:relative;scroll-margin-top:100px}
+@media(max-width:560px){
+  .daily-viral-panel,.daily-challenge-panel{width:92%;max-width:92%;box-sizing:border-box;margin-left:auto;margin-right:auto}
+}
+</style>
+
+
+<style id="challenge-agenda-v7">
+.challenge-agenda{overflow:hidden}
+.agenda-top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
+.agenda-date{min-width:92px;text-align:center;border-radius:22px;padding:10px 12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14)}
+.agenda-date strong{display:block;font-size:2.35rem;line-height:1;font-weight:1000}
+.agenda-date span{display:block;color:#ffd43b;font-weight:1000;text-transform:uppercase;margin-top:4px}
+.agenda-date small{display:block;color:var(--muted);margin-top:3px}
+.agenda-line{height:1px;background:linear-gradient(90deg,rgba(255,255,255,.22),transparent);margin:20px 0}
+.challenge-label{font-size:.75rem;font-weight:1000;letter-spacing:.12em;color:#ffd43b}
+.challenge-complete-btn{width:100%;margin-top:18px;min-height:58px;border:0;border-radius:18px;background:linear-gradient(135deg,#19d96b,#09b858);color:white;font-size:1rem;font-weight:1000;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;box-shadow:0 12px 26px rgba(9,184,88,.20);transition:.2s ease}
+.challenge-complete-btn:active{transform:scale(.98)}
+.challenge-complete-btn.done{background:rgba(255,255,255,.09);color:#9fe6bb;box-shadow:none;border:1px solid rgba(25,217,107,.3);cursor:default}
+.check-circle{display:grid;place-items:center;width:27px;height:27px;border:2px solid currentColor;border-radius:50%}
+.challenge-trophy{display:none;grid-template-columns:auto 1fr;align-items:center;gap:15px;margin-top:18px;padding:18px;border-radius:20px;background:linear-gradient(135deg,rgba(255,212,59,.15),rgba(255,159,28,.08));border:1px solid rgba(255,212,59,.28)}
+.challenge-trophy.show{display:grid;animation:trophyIn .55s cubic-bezier(.2,.9,.25,1.2)}
+.trophy-cup{font-size:3rem;filter:drop-shadow(0 7px 12px rgba(255,190,0,.25));animation:trophyGlow 1.5s ease-in-out infinite}
+.challenge-trophy strong{display:block;color:#ffe36b;font-size:1.08rem}.challenge-trophy small{display:block;color:#d8e0ea;line-height:1.4;margin-top:3px}
+.challenge-history{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.challenge-history>div{padding:14px;border-radius:17px;background:rgba(0,0,0,.20);border:1px solid rgba(255,255,255,.10);text-align:center}
+.challenge-history strong{display:block;font-size:1.45rem}.challenge-history span{display:block;color:var(--muted);font-size:.78rem;margin-top:2px}
+@keyframes trophyIn{from{opacity:0;transform:scale(.75) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes trophyGlow{50%{transform:translateY(-3px) rotate(3deg);filter:drop-shadow(0 7px 18px rgba(255,210,0,.55))}}
+@media(max-width:560px){.agenda-top{align-items:center}.agenda-date{min-width:80px}.agenda-date strong{font-size:2rem}.challenge-history{grid-template-columns:1fr 1fr}}
+</style>
+
+
+<style id="full-profile-v8">
+.full-profile-page{display:none;min-height:calc(100vh - 72px);padding:34px 0 70px;background:radial-gradient(circle at 20% 0,rgba(51,195,255,.10),transparent 30%),radial-gradient(circle at 90% 30%,rgba(255,49,49,.09),transparent 28%)}
+.full-profile-page.active{display:block}
+body.profile-page-open .hero,body.profile-page-open main,body.profile-page-open .daily-viral-panel,body.profile-page-open .daily-challenge-panel,body.profile-page-open footer{display:none!important}
+.profile-page-shell{width:min(1120px,92%);margin:auto}
+.profile-page-head{display:flex;gap:18px;align-items:flex-start;margin-bottom:25px}.profile-back-btn{width:48px;height:48px;flex:0 0 48px;border:1px solid rgba(255,255,255,.15);border-radius:16px;background:rgba(255,255,255,.07);color:white;font-size:2rem;cursor:pointer}.profile-page-kicker,.profile-section-tag{font-size:.75rem;font-weight:1000;letter-spacing:.13em;color:#33c3ff}.profile-page-head h1{font-size:clamp(2rem,6vw,3.7rem);margin:2px 0 5px}.profile-page-head p,.goal-card>p,.profile-tip-card p{color:var(--muted);line-height:1.55}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.profile-card{background:linear-gradient(145deg,rgba(255,255,255,.095),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.13);border-radius:28px;padding:24px;box-shadow:0 18px 50px rgba(0,0,0,.18)}
+.identity-card{display:grid;grid-template-columns:130px 1fr;gap:20px;align-items:center}.profile-photo-wrap{width:130px;height:130px;border-radius:30px;overflow:hidden;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);position:relative}.profile-photo-wrap img{width:100%;height:100%;object-fit:cover;display:none}.profile-photo-fallback{position:absolute;inset:0;display:grid;place-items:center;font-size:3rem}
+.profile-identity-fields label{display:block;font-weight:900;margin-bottom:7px}.profile-identity-fields input,.goal-card textarea{width:100%;box-sizing:border-box;border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.22);color:white;border-radius:15px;padding:14px;font:inherit;outline:none}.goal-card textarea{min-height:112px;resize:vertical;margin:14px 0}.profile-photo-btn,.profile-save-btn,.goal-complete-btn{width:100%;min-height:48px;border:0;border-radius:14px;font-weight:1000;cursor:pointer;margin-top:9px}.profile-photo-btn{background:rgba(51,195,255,.13);color:#8ee2ff;border:1px solid rgba(51,195,255,.28)}.profile-save-btn{background:linear-gradient(135deg,#33c3ff,#168dff);color:white}.goal-complete-btn{background:linear-gradient(135deg,#ffd43b,#ff9f1c);color:#171717}.profile-identity-fields small{display:block;min-height:18px;color:#86efac;margin-top:7px}
+.achievements-card{margin-top:18px}.achievements-head{display:flex;justify-content:space-between;align-items:center;gap:15px}.achievements-head h2,.goal-card h2{margin-top:4px}.achievement-total{text-align:center;padding:8px 14px;border-radius:16px;background:rgba(255,212,59,.10);border:1px solid rgba(255,212,59,.20)}.achievement-total strong{display:block;font-size:1.5rem;color:#ffd43b}.achievement-total span{font-size:.72rem;color:var(--muted)}
+.achievement-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}.achievement-item{position:relative;padding:18px;border-radius:20px;background:rgba(0,0,0,.20);border:1px solid rgba(255,212,59,.18)}.achievement-medal{font-size:2.1rem;margin-bottom:8px}.achievement-item strong{display:block;line-height:1.3}.achievement-item small{display:block;color:var(--muted);margin-top:7px}.achievement-empty{padding:24px 0 4px;color:var(--muted)}
+.profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}.profile-stats article{padding:19px;border-radius:22px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.10)}.profile-stats strong{display:block;font-size:1.65rem}.profile-stats span{display:block;font-weight:900;margin-top:2px}.profile-stats small{color:var(--muted)}
+.profile-tip-card{display:flex;gap:15px;align-items:center;margin-top:18px}.profile-tip-icon{width:48px;height:48px;flex:0 0 48px;display:grid;place-items:center;border-radius:15px;background:linear-gradient(135deg,#7c5cff,#33c3ff);font-size:1.5rem}.profile-tip-card p{margin-top:4px}
+.gallery-consent-modal{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.76);backdrop-filter:blur(8px)}.gallery-consent-modal.active{display:flex}.gallery-consent-box{width:min(430px,100%);background:#151922;border:1px solid rgba(255,255,255,.14);border-radius:28px;padding:26px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.55)}.gallery-lock{font-size:2.4rem}.gallery-consent-box h3{font-size:1.45rem;margin:10px 0 8px}.gallery-consent-box p{color:#aeb8c7;line-height:1.55}.gallery-consent-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}.gallery-consent-actions button{min-height:48px;border-radius:14px;font-weight:1000;cursor:pointer}.gallery-consent-actions .deny{background:rgba(255,255,255,.07);color:white;border:1px solid rgba(255,255,255,.13)}.gallery-consent-actions .allow{border:0;background:linear-gradient(135deg,#33c3ff,#168dff);color:white}
+@media(max-width:760px){.profile-grid{grid-template-columns:1fr}.identity-card{grid-template-columns:1fr}.profile-photo-wrap{margin:auto}.achievement-grid{grid-template-columns:1fr}.profile-stats{grid-template-columns:1fr}.profile-card{padding:19px}.gallery-consent-actions{grid-template-columns:1fr}.profile-page-head{gap:12px}}
+</style>
+
+
+<style id="animated-medal-v10">
+.achievement-medal{height:58px;display:flex;align-items:center;margin-bottom:10px}
+.animated-medal-icon{position:relative;display:block;width:48px;height:56px;animation:medalFloat 2.6s ease-in-out infinite;filter:drop-shadow(0 7px 10px rgba(255,190,0,.18))}
+.animated-medal-icon .medal-ribbon{position:absolute;top:0;width:16px;height:27px;z-index:1}
+.animated-medal-icon .medal-ribbon.left{left:9px;background:linear-gradient(180deg,#2e7df6,#184db4);clip-path:polygon(0 0,100% 0,78% 100%,0 82%);transform:rotate(-7deg)}
+.animated-medal-icon .medal-ribbon.right{right:9px;background:linear-gradient(180deg,#ff4b55,#c91f35);clip-path:polygon(0 0,100% 0,100% 82%,22% 100%);transform:rotate(7deg)}
+.animated-medal-icon b{position:absolute;z-index:2;left:7px;bottom:0;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 28%,#fff1a3 0 10%,#ffd43b 27%,#f3a800 68%,#c97b00 100%);border:2px solid #ffe77a;box-shadow:inset 0 0 0 3px rgba(154,91,0,.22),0 0 0 1px rgba(255,212,59,.28);animation:medalShine 1.9s ease-in-out infinite}
+.animated-medal-icon b:after{content:"";position:absolute;inset:5px;border:1px solid rgba(130,72,0,.38);border-radius:50%}
+.animated-medal-icon em{font-style:normal;font-size:15px;line-height:1;color:#fff4b2;text-shadow:0 1px 2px rgba(120,65,0,.6);animation:starPulse 1.9s ease-in-out infinite}
+@keyframes medalFloat{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-5px) rotate(2deg)}}
+@keyframes medalShine{0%,100%{filter:brightness(1);box-shadow:inset 0 0 0 3px rgba(154,91,0,.22),0 0 7px rgba(255,196,0,.12)}50%{filter:brightness(1.15);box-shadow:inset 0 0 0 3px rgba(154,91,0,.18),0 0 16px rgba(255,205,35,.45)}}
+@keyframes starPulse{0%,100%{transform:scale(.9)}50%{transform:scale(1.12)}}
+@media(prefers-reduced-motion:reduce){.animated-medal-icon,.animated-medal-icon b,.animated-medal-icon em{animation:none}}
+</style>
+
+
+<style id="multi-goals-v11">
+.add-goal-btn{width:100%;min-height:50px;border:0;border-radius:15px;background:linear-gradient(135deg,#33c3ff,#168dff);color:#fff;font-weight:1000;cursor:pointer}
+.pending-goals-head{display:flex;align-items:center;justify-content:space-between;margin-top:22px;margin-bottom:10px}.pending-goals-head span{min-width:30px;height:30px;padding:0 8px;border-radius:999px;display:grid;place-items:center;background:rgba(51,195,255,.12);color:#73d9ff;font-weight:1000}
+.pending-goals-empty{color:var(--muted);font-size:.9rem;padding:12px 0}
+.pending-goals-list{display:grid;gap:10px}
+.pending-goal-item{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:14px;border-radius:17px;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.11)}
+.pending-goal-item strong{display:block;line-height:1.35}.pending-goal-item small{display:block;color:var(--muted);margin-top:4px}
+.pending-goal-actions{display:flex;gap:7px}.pending-goal-actions button,.delete-medal-btn{border:0;cursor:pointer;font-weight:900}
+.pending-goal-done{min-height:40px;padding:0 12px;border-radius:12px;background:linear-gradient(135deg,#ffd43b,#ff9f1c);color:#171717}
+.pending-goal-delete{width:40px;height:40px;border-radius:12px;background:rgba(255,70,70,.12);color:#ff7a7a;font-size:1.1rem}
+.achievement-item{padding-right:52px}
+.delete-medal-btn{position:absolute;right:12px;top:12px;width:34px;height:34px;border-radius:10px;background:rgba(255,70,70,.10);color:#ff7777;font-size:1rem;display:grid;place-items:center}
+.delete-medal-btn:active,.pending-goal-actions button:active{transform:scale(.95)}
+@media(max-width:560px){.pending-goal-item{grid-template-columns:1fr}.pending-goal-actions{width:100%}.pending-goal-done{flex:1}}
+</style>
+<style id="medal-delete-v13">
+.achievement-item{padding-right:18px!important}.delete-medal-btn{position:static!important;width:100%!important;height:44px!important;margin-top:15px;border-radius:13px!important;background:rgba(255,67,67,.10)!important;border:1px solid rgba(255,85,85,.18)!important;color:#ff8585!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:8px!important}
+.trash-ani{position:relative;display:inline-block;width:20px;height:22px}.trash-ani:before{content:"";position:absolute;left:4px;top:6px;width:13px;height:14px;border:2px solid currentColor;border-radius:2px 2px 5px 5px}.trash-ani:after{content:"";position:absolute;left:2px;top:3px;width:17px;height:2px;background:currentColor}.trash-ani i:before{content:"";position:absolute;left:7px;top:0;width:7px;height:4px;border:2px solid currentColor;border-bottom:0;border-radius:4px 4px 0 0}
+.delete-medal-modal{position:fixed;inset:0;z-index:12000;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(5,8,13,.82);backdrop-filter:blur(10px)}.delete-medal-modal.active{display:flex}.delete-medal-box{width:min(430px,100%);padding:28px;border-radius:28px;background:linear-gradient(145deg,#20232a,#15171c);border:1px solid rgba(255,255,255,.13);text-align:center;box-shadow:0 28px 90px rgba(0,0,0,.6);animation:delIn .25s ease}.delete-modal-icon{width:64px;height:64px;margin:0 auto 13px;border-radius:20px;display:grid;place-items:center;background:rgba(255,70,70,.11);color:#ff6767}.trash-ani.big{transform:scale(1.45)}.delete-modal-kicker{font-size:.72rem;letter-spacing:.13em;font-weight:1000;color:#ff6b6b}.delete-medal-box h3{font-size:1.55rem;margin:7px 0}.delete-medal-box p,.delete-medal-box small{color:#aeb7c4}.delete-medal-name{display:block;margin:14px 0;padding:13px;border-radius:14px;background:rgba(255,255,255,.055)}.delete-medal-actions{display:grid;grid-template-columns:1fr 1.3fr;gap:9px;margin-top:22px}.delete-medal-actions button{min-height:49px;border-radius:14px;font-weight:1000}.cancel-delete-medal{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:white}.confirm-delete-medal{border:0;background:linear-gradient(135deg,#ff5252,#d9273d);color:white}@keyframes delIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}@media(max-width:480px){.delete-medal-actions{grid-template-columns:1fr}}
+</style><style>
+.achievement-item{display:flex!important;flex-direction:column!important;align-items:center!important;text-align:center!important}
+.achievement-medal{width:100%!important;height:68px!important;display:flex!important;align-items:center!important;justify-content:center!important;margin:0 auto 10px!important}
+.achievement-item>strong,.achievement-item>small{width:100%;text-align:center!important}
+.delete-medal-btn{position:static!important;width:auto!important;min-width:140px!important;height:36px!important;min-height:36px!important;padding:0 12px!important;margin:13px auto 0!important;border-radius:10px!important;font-size:.76rem!important;gap:5px!important;align-self:center!important}
+.delete-medal-btn .trash-ani{transform:scale(.72);margin:-3px}
+</style>
+<style id="settings-v15">
+.settings-ani-icon{position:relative;background:linear-gradient(135deg,rgba(124,92,255,.24),rgba(51,195,255,.12))!important;border:1px solid rgba(124,150,255,.45)!important;animation:iconFloat 2.6s ease-in-out infinite}.settings-ani-icon:before{content:"";position:absolute;inset:8px;border:3px dashed #9cc8ff;border-radius:50%;animation:settingsSpin 7s linear infinite}.settings-ani-icon:after{content:"";position:absolute;left:15px;top:15px;width:8px;height:8px;border-radius:50%;background:white;box-shadow:0 0 8px rgba(255,255,255,.45)}@keyframes settingsSpin{to{transform:rotate(360deg)}}
+.settings-page{display:none;min-height:calc(100vh - 72px);padding:34px 0 75px;background:radial-gradient(circle at 80% 0,rgba(124,92,255,.11),transparent 30%)}.settings-page.active{display:block}body.settings-open .hero,body.settings-open main,body.settings-open .daily-viral-panel,body.settings-open .daily-challenge-panel,body.settings-open footer,body.settings-open #fullProfilePage{display:none!important}.settings-shell{width:min(1050px,92%);margin:auto}.settings-head{display:flex;gap:17px;align-items:flex-start;margin-bottom:25px}.settings-back{width:48px;height:48px;flex:0 0 48px;border-radius:16px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:inherit;font-size:2rem}.settings-kicker{color:#8ea9ff;font-size:.74rem;font-weight:1000;letter-spacing:.13em}.settings-head h1{font-size:clamp(2rem,6vw,3.5rem);margin:2px 0}.settings-head p,.settings-card p{color:var(--muted)}
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.settings-card{padding:22px;border-radius:25px;background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.12)}.settings-wide{grid-column:1/-1}.settings-card-title{display:flex;gap:12px;align-items:center;margin-bottom:18px}.settings-card-title h2{font-size:1.15rem}.settings-card-icon{width:42px;height:42px;flex:0 0 42px;border-radius:13px;display:grid;place-items:center;background:rgba(124,92,255,.14);color:#aebdff;font-weight:1000}
+.theme-options,.font-options{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.theme-choice,.font-options button{border:1px solid rgba(255,255,255,.12);border-radius:15px;background:rgba(0,0,0,.16);color:inherit;padding:11px;font-weight:900}.theme-choice.active,.font-options button.active{border-color:#5fbfff;box-shadow:inset 0 0 0 1px #5fbfff;background:rgba(51,195,255,.09)}.theme-preview{height:38px;border-radius:9px;display:block;margin-bottom:7px;border:1px solid rgba(255,255,255,.12)}.theme-preview.dark{background:#101217}.theme-preview.light{background:#f5f6f8}.theme-preview.system{background:linear-gradient(90deg,#101217 50%,#f5f6f8 50%)}.font-options button{font-size:1.3rem}.font-options small{display:block;font-size:.68rem;color:var(--muted);margin-top:3px}
+.setting-row{display:flex;align-items:center;justify-content:space-between;gap:15px}.setting-row strong,.setting-row small{display:block}.setting-row small{color:var(--muted);margin-top:3px}.setting-row input{display:none}.setting-switch{width:50px;height:28px;border-radius:999px;background:#444b56;position:relative;flex:0 0 50px;transition:.2s}.setting-switch:after{content:"";position:absolute;width:22px;height:22px;left:3px;top:3px;border-radius:50%;background:white;transition:.2s}.setting-row input:checked+.setting-switch{background:#20c96b}.setting-row input:checked+.setting-switch:after{transform:translateX(22px)}
+#startPageSetting{width:100%;padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,.13);background:#171a20;color:inherit;font:inherit}.reset-settings-btn{width:100%;min-height:48px;border-radius:14px;border:1px solid rgba(255,180,50,.25);background:rgba(255,180,50,.08);color:#ffd36b;font-weight:1000}.settings-saved{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);opacity:0;pointer-events:none;padding:11px 17px;border-radius:999px;background:#1bc96b;color:white;font-weight:900;transition:.25s;z-index:13000}.settings-saved.show{opacity:1;transform:translate(-50%,0)}
+.reset-settings-modal{display:none;position:fixed;inset:0;z-index:14000;align-items:center;justify-content:center;padding:20px;background:rgba(4,6,10,.82);backdrop-filter:blur(9px)}.reset-settings-modal.active{display:flex}.reset-settings-box{width:min(420px,100%);padding:27px;border-radius:27px;background:#1b1e24;border:1px solid rgba(255,255,255,.13);text-align:center}.reset-settings-symbol{font-size:2rem;color:#ffd36b}.reset-settings-box>span{font-size:.72rem;letter-spacing:.13em;font-weight:1000;color:#ffd36b}.reset-settings-box h3{font-size:1.5rem;margin:7px}.reset-settings-box p{color:#aeb7c4;line-height:1.5}.reset-settings-box>div:last-child{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:20px}.reset-settings-box button{min-height:47px;border-radius:13px;font-weight:1000}.reset-settings-box button:first-child{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:white}.reset-settings-box button:last-child{border:0;background:linear-gradient(135deg,#ffd43b,#ff9f1c);color:#151515}
+html.app-font-small{font-size:14px}html.app-font-large{font-size:18px}html.reduce-motion *,html.reduce-motion *:before,html.reduce-motion *:after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+html.light-theme body{background:#f4f6f9!important;color:#171a20!important}html.light-theme .nav,html.light-theme .profile-card,html.light-theme .settings-card,html.light-theme .daily-challenge-panel,html.light-theme .daily-viral-panel{background:#fff!important;color:#171a20!important}html.light-theme .settings-card p,html.light-theme .settings-head p{color:#687180!important}
+@media(max-width:700px){.settings-grid{grid-template-columns:1fr}.settings-wide{grid-column:auto}.theme-options,.font-options{grid-template-columns:repeat(3,1fr)}}
+</style>
+
+
+<style id="support-v16">
+.support-ani-icon{position:relative;background:linear-gradient(135deg,rgba(31,201,107,.22),rgba(51,195,255,.10))!important;border:1px solid rgba(60,220,140,.42)!important;animation:iconFloat 2.6s ease-in-out infinite}.support-ani-icon:before{content:"";position:absolute;left:9px;top:8px;width:20px;height:17px;border:2px solid #7cf0ad;border-radius:9px 9px 11px 11px}.support-ani-icon:after{content:"";position:absolute;left:13px;top:25px;width:7px;height:6px;background:#7cf0ad;clip-path:polygon(0 0,100% 0,0 100%)}.support-ani-icon i:before,.support-ani-icon i:after{content:"";position:absolute;top:15px;width:3px;height:3px;border-radius:50%;background:white}.support-ani-icon i:before{left:15px}.support-ani-icon i:after{left:21px}
+.support-page{display:none;min-height:calc(100vh - 72px);padding:34px 0 75px;background:radial-gradient(circle at 85% 0,rgba(31,201,107,.09),transparent 30%)}.support-page.active{display:block}body.support-open .hero,body.support-open main,body.support-open .daily-viral-panel,body.support-open .daily-challenge-panel,body.support-open footer,body.support-open #fullProfilePage,body.support-open #settingsPage{display:none!important}.support-shell{width:min(1050px,92%);margin:auto}.support-head{display:flex;gap:17px;align-items:flex-start;margin-bottom:25px}.support-back{width:48px;height:48px;flex:0 0 48px;border-radius:16px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:inherit;font-size:2rem}.support-kicker,.support-section-title span{font-size:.74rem;font-weight:1000;letter-spacing:.13em;color:#5de59a}.support-head h1{font-size:clamp(2rem,6vw,3.5rem);margin:2px 0}.support-head p,.support-contact-card p,.support-rules p,.support-check-card p,.support-security-card p{color:var(--muted);line-height:1.55}
+.support-contact-card{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;padding:24px;border-radius:27px;background:linear-gradient(135deg,rgba(31,201,107,.13),rgba(51,195,255,.06));border:1px solid rgba(83,224,148,.23)}.support-mail-icon{width:58px;height:58px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,#1fc96b,#22a8e8);position:relative}.support-mail-icon:before{content:"";width:28px;height:20px;border:3px solid white;border-radius:5px}.support-mail-icon:after{content:"";position:absolute;width:17px;height:17px;border-left:3px solid white;border-bottom:3px solid white;transform:rotate(-45deg);top:14px}.support-contact-copy>span{font-size:.7rem;font-weight:1000;letter-spacing:.11em;color:#72e9a7}.support-contact-copy h2{font-size:clamp(1rem,4vw,1.4rem);overflow-wrap:anywhere;margin:4px 0}.support-email-btn{padding:13px 16px;border-radius:14px;background:#1fc96b;color:#08130d!important;text-decoration:none;font-weight:1000;white-space:nowrap}
+.support-section-title{margin:30px 0 14px}.support-section-title h2{font-size:1.7rem;margin-top:3px}.support-rules{display:grid;grid-template-columns:1fr 1fr;gap:12px}.support-rules article{display:grid;grid-template-columns:auto 1fr;gap:13px;padding:19px;border-radius:21px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.10)}.support-rules b{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:rgba(31,201,107,.11);color:#61e69d}.support-rules h3{font-size:1rem;margin-bottom:4px}
+.support-check-card,.support-security-card{display:flex;gap:14px;align-items:center;padding:20px;border-radius:22px;margin-top:14px}.support-check-card{background:rgba(51,195,255,.07);border:1px solid rgba(51,195,255,.16)}.support-security-card{background:rgba(255,212,59,.07);border:1px solid rgba(255,212,59,.16)}.support-check-icon,.support-lock{width:45px;height:45px;flex:0 0 45px;border-radius:14px;display:grid;place-items:center;background:rgba(51,195,255,.12);font-size:1.25rem}.support-lock{background:rgba(255,212,59,.11)}
+@media(max-width:720px){.support-contact-card{grid-template-columns:auto 1fr}.support-email-btn{grid-column:1/-1;text-align:center}.support-rules{grid-template-columns:1fr}}
+</style>
+
+<meta name="theme-color" content="#101217">
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Funil de Vendas">
+
+<style id="cloud-pwa-v17">
+.cloud-save-status{position:fixed;right:14px;bottom:14px;z-index:9000;display:flex;align-items:center;gap:7px;padding:8px 11px;border-radius:999px;background:rgba(15,18,24,.9);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(8px);font-size:.72rem;color:#aeb7c4;opacity:.88}.cloud-dot{width:8px;height:8px;border-radius:50%;background:#f3b92f}.cloud-save-status.cloud-ok .cloud-dot{background:#21ce70;box-shadow:0 0 8px rgba(33,206,112,.55)}.cloud-save-status.cloud-sync .cloud-dot{background:#4db7ff;animation:cloudPulse .8s infinite alternate}.cloud-save-status.cloud-error .cloud-dot{background:#ff6262}@keyframes cloudPulse{to{transform:scale(1.45)}}
+.install-app-modal{display:none;position:fixed;inset:0;z-index:20000;align-items:center;justify-content:center;padding:20px;background:rgba(4,7,12,.86);backdrop-filter:blur(12px)}.install-app-modal.active{display:flex}.install-app-box{position:relative;width:min(430px,100%);padding:31px 24px 24px;border-radius:29px;text-align:center;background:linear-gradient(155deg,#20242d,#15181e);border:1px solid rgba(255,255,255,.13);box-shadow:0 30px 80px rgba(0,0,0,.45)}.install-close{position:absolute;right:13px;top:13px;width:36px;height:36px;border:0;border-radius:50%;background:rgba(255,255,255,.07);color:#bbc3ce;font-size:1.35rem}.install-app-icon{width:78px;height:78px;margin:0 auto 14px;border-radius:23px;background:linear-gradient(135deg,#7c5cff,#24b7e9);position:relative;box-shadow:0 14px 35px rgba(86,94,255,.25)}.install-app-icon:before{content:"";position:absolute;left:26px;top:18px;width:26px;height:30px;border:3px solid white;border-radius:7px}.install-app-icon:after{content:"↓";position:absolute;left:0;right:0;bottom:6px;color:white;font-size:1.2rem;font-weight:1000}.install-kicker{font-size:.68rem;letter-spacing:.14em;font-weight:1000;color:#91a6ff}.install-app-box h2{font-size:1.65rem;margin:5px 0 9px}.install-app-box>p{color:#aeb7c4;line-height:1.5}.install-main-btn,.install-later-btn{width:100%;min-height:50px;border-radius:15px;font-weight:1000;margin-top:12px}.install-main-btn{border:0;background:linear-gradient(135deg,#7c5cff,#28b8e8);color:white}.install-later-btn{border:1px solid rgba(255,255,255,.11);background:rgba(255,255,255,.05);color:#c4ccd7}.install-app-box>small{display:block;color:#747e8c;margin-top:12px}.ios-install-steps{display:none;text-align:left;margin:15px 0 4px;padding:15px;border-radius:16px;background:rgba(124,92,255,.08);border:1px solid rgba(124,92,255,.18)}.ios-install-steps.show{display:grid;gap:7px}.ios-install-steps b{color:#b7c3ff}.ios-install-steps span{font-size:.84rem;color:#b5beca}
+</style>
+<style id="auth-onboarding-v18">
+.auth-gate,.onboarding-gate{position:fixed;inset:0;z-index:30000;background:radial-gradient(circle at 80% 0,rgba(124,92,255,.2),transparent 35%),#0c0f14;display:none;align-items:center;justify-content:center;padding:18px;overflow:auto}.auth-gate.active,.onboarding-gate.active{display:flex}.auth-box,.onboarding-box{width:min(455px,100%);padding:27px;border-radius:30px;background:linear-gradient(150deg,#1c2028,#12151b);border:1px solid rgba(255,255,255,.12);box-shadow:0 35px 90px rgba(0,0,0,.5);color:#f7f8fa}.auth-brand{display:flex;align-items:center;gap:9px;margin-bottom:25px;font-size:.75rem;font-weight:1000;letter-spacing:.11em}.auth-logo{width:35px;height:35px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,#7c5cff,#26b7e8);font-size:1.3rem}.auth-kicker,.step-count{color:#91a6ff;font-size:.68rem;font-weight:1000;letter-spacing:.14em}.auth-box h1,.onboarding-box h1{font-size:2rem;margin:4px 0 7px}.auth-box p,.onboarding-box p{color:#9da7b5;line-height:1.5}.auth-box label,.onboarding-box label{display:block;margin-top:15px;font-size:.78rem;font-weight:900;color:#cbd2dc}.auth-box input,.onboarding-box input{width:100%;box-sizing:border-box;margin-top:7px;padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:#0f1217;color:white;font:inherit;outline:none}.auth-box input:focus,.onboarding-box input:focus{border-color:#7c8cff}.password-wrap{position:relative}.password-wrap input{padding-right:48px}.password-wrap button{position:absolute;right:5px;top:12px;width:39px;height:39px;border:0;background:transparent;color:#8e99a8}.auth-primary{width:100%;min-height:51px;margin-top:18px;border:0;border-radius:15px;background:linear-gradient(135deg,#7c5cff,#27b8e8);color:white;font-weight:1000}.auth-link{width:100%;border:0;background:transparent;color:#aebaff;padding:13px 5px 3px;font-weight:800}.auth-link.muted{color:#7e8897}.auth-message{min-height:20px;text-align:center;color:#ff8383;font-size:.78rem;margin-top:9px}.code-icon{font-size:2rem;margin-bottom:10px}.code-input{text-align:center!important;font-size:1.8rem!important;letter-spacing:.3em!important;font-weight:1000}.onboarding-box{width:min(650px,100%)}.onboarding-progress{height:5px;background:rgba(255,255,255,.07);border-radius:9px;margin-bottom:25px;overflow:hidden}.onboarding-progress i{display:block;height:100%;width:14%;background:linear-gradient(90deg,#7c5cff,#26b7e8);transition:.3s}.on-step{display:none;min-height:330px}.on-step.active{display:block}.on-step h2{font-size:1.7rem;margin:8px 0}.profile-photo-picker{width:105px;height:105px;border-radius:50%;margin:25px auto 8px;background:rgba(124,92,255,.12);border:2px dashed rgba(154,167,255,.5);display:grid;place-items:center;overflow:hidden;font-size:2rem;color:#aebaff}.profile-photo-picker img{width:100%;height:100%;object-fit:cover;display:none}.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}.choice-grid button{min-height:83px;padding:14px;border-radius:17px;text-align:left;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.045);color:#eef1f5;font:inherit}.choice-grid button b,.choice-grid button small{display:block}.choice-grid button small{color:#87919f;margin-top:3px}.choice-grid button.selected{border-color:#7188ff;background:rgba(113,136,255,.14);box-shadow:inset 0 0 0 1px #7188ff}.on-actions{display:flex;gap:10px}.on-actions button{flex:1;min-height:49px;border-radius:14px;font-weight:1000}.on-actions #onBack{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#c7ced7}.on-actions #onNext{border:0;background:linear-gradient(135deg,#7c5cff,#27b8e8);color:white}.finish-icon{width:76px;height:76px;margin:45px auto 18px;border-radius:50%;display:grid;place-items:center;background:#20c96b;font-size:2rem;font-weight:1000}.on-step[data-step="6"]{text-align:center}.personal-goal-banner{margin:12px auto;padding:12px 15px;border-radius:15px;background:rgba(124,92,255,.09);border:1px solid rgba(124,92,255,.16)}@media(max-width:550px){.choice-grid{grid-template-columns:1fr}.on-step{min-height:400px}.auth-box,.onboarding-box{padding:22px}}
+</style><style id="username-auth-v19">.recovery-code{margin:20px 0;padding:18px;border:1px dashed #7f91ff;border-radius:16px;background:rgba(124,92,255,.1);font-size:1.35rem;font-weight:1000;letter-spacing:.12em;text-align:center;color:#dce1ff;user-select:all}</style><style id="animated-question-icons-v20">
+.eye-icon{position:relative;display:block;width:22px;height:15px;border:2px solid currentColor;border-radius:50%/65%;transform:scale(.9);transition:.2s}.eye-icon i{position:absolute;left:50%;top:50%;width:6px;height:6px;border-radius:50%;background:currentColor;transform:translate(-50%,-50%);transition:.2s}.password-wrap button.eye-open .eye-icon i{transform:translate(-50%,-50%) scale(1.45)}.password-wrap button:hover .eye-icon{transform:scale(1)}
+.q-ani{position:relative;display:block;width:42px;height:42px;margin:0 0 9px;color:#91a6ff;animation:qFloat 2.5s ease-in-out infinite}.q-ani i,.q-ani em{position:absolute;display:block;font-style:normal}
+.money-ani i{left:7px;top:8px;width:27px;height:25px;border:2px solid currentColor;border-radius:7px}.money-ani i:after{content:"$";position:absolute;inset:0;display:grid;place-items:center;font-weight:1000}.money-ani em{width:9px;height:9px;border-radius:50%;background:#32d583;right:1px;top:2px;animation:qPulse 1.3s infinite}
+.growth-ani i{left:5px;bottom:5px;width:30px;height:27px;border-left:2px solid currentColor;border-bottom:2px solid currentColor}.growth-ani i:after{content:"";position:absolute;width:24px;height:14px;left:5px;top:2px;border-top:3px solid #32d583;border-right:3px solid #32d583;transform:skewY(-28deg)}.growth-ani em{right:1px;top:2px;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:9px solid #32d583;transform:rotate(45deg)}
+.star-ani i{inset:5px;background:linear-gradient(135deg,#ffd85c,#ffae2b);clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 94%,50% 72%,21% 94%,32% 57%,2% 35%,39% 35%);animation:starSpin 4s linear infinite}
+.network-ani i,.network-ani em{width:15px;height:15px;border:2px solid currentColor;border-radius:50%;top:4px}.network-ani i{left:3px}.network-ani em{right:3px}.network-ani:after{content:"";position:absolute;left:5px;right:5px;bottom:5px;height:14px;border:2px solid #32d583;border-top:0;border-radius:0 0 18px 18px;animation:qPulse 1.6s infinite}
+.speed-ani i{inset:3px;background:linear-gradient(#ffe36e,#ffae32);clip-path:polygon(55% 0,18% 53%,45% 53%,33% 100%,82% 40%,55% 40%);animation:qPulse 1.2s infinite}
+.viral-ani i{left:10px;top:4px;width:22px;height:30px;border:3px solid #ff8a5b;border-radius:50% 50% 45% 45%;transform:rotate(8deg);animation:flameMove 1.3s ease-in-out infinite}.viral-ani em{left:17px;top:16px;width:10px;height:18px;background:#ffd85c;border-radius:50%}
+.target-ani i{inset:3px;border:2px solid currentColor;border-radius:50%}.target-ani i:after{content:"";position:absolute;inset:8px;border:2px solid #32d583;border-radius:50%}.target-ani em{left:19px;top:19px;width:6px;height:6px;background:#ff6b7d;border-radius:50%;animation:qPulse 1.2s infinite}
+.chat-ani i{left:4px;top:6px;width:32px;height:25px;border:2px solid currentColor;border-radius:10px}.chat-ani i:after{content:"";position:absolute;left:7px;bottom:-7px;width:9px;height:9px;border-left:2px solid currentColor;transform:skew(-28deg)}.chat-ani{animation:chatBob 2s ease-in-out infinite}
+@keyframes qFloat{50%{transform:translateY(-4px)}}@keyframes qPulse{50%{transform:scale(1.22)}}@keyframes starSpin{50%{transform:rotate(18deg) scale(1.08)}}@keyframes flameMove{50%{transform:rotate(-6deg) scale(.94,1.08)}}@keyframes chatBob{50%{transform:translateY(-3px) rotate(2deg)}}
+.choice-grid button.selected .q-ani{filter:drop-shadow(0 0 8px rgba(117,139,255,.45))}
+</style><style id="identity-v22">#companyHeaderLogo:not([src]){display:none!important}</style><style id="privacy-legal-v26">.photo-privacy-overlay[hidden],.legal-modal[hidden]{display:none!important}.photo-privacy-overlay,.legal-modal{position:fixed;inset:0;z-index:60000;background:rgba(5,8,15,.86);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto}.photo-privacy-panel,.legal-panel{width:min(480px,100%);max-height:90dvh;overflow:auto;padding:25px;border:1px solid rgba(255,255,255,.14);border-radius:24px;background:#1a1f28;color:#f5f7fc;box-shadow:0 30px 80px #0008}.photo-privacy-symbol{width:60px;height:60px;margin:0 auto 12px;border-radius:18px;background:linear-gradient(135deg,#7558fa,#29b6e6);display:grid;place-items:center}.photo-lock{width:23px;height:20px;border:3px solid white;border-radius:5px;position:relative;animation:lockBob 2s ease-in-out infinite}.photo-lock:before{content:"";position:absolute;width:13px;height:12px;left:2px;top:-15px;border:3px solid white;border-bottom:0;border-radius:10px 10px 0 0}.photo-privacy-kicker{display:block;text-align:center;font-size:.68rem;letter-spacing:.13em;color:#a9b7ff;font-weight:900}.photo-privacy-panel h2{text-align:center;font-size:1.45rem;margin:8px 0}.photo-privacy-panel p,.photo-privacy-panel li,.legal-panel p,.legal-panel li{color:#c0c8d3;line-height:1.55;font-size:.9rem}.photo-privacy-panel ul{padding-left:20px}.photo-privacy-panel li{margin:9px 0}.photo-privacy-actions{display:flex;gap:10px;margin:18px 0}.photo-privacy-actions button{flex:1;padding:13px 8px;border:1px solid #ffffff25;border-radius:12px;background:#303744;color:white;font-weight:800}.photo-privacy-actions #photoPrivacyAllow{border:0;background:linear-gradient(135deg,#7659ff,#20b4e5)}.photo-privacy-panel small{display:block;color:#8f9aaa;line-height:1.4}.funil-legal{padding:15px 0 0}.legal-links{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 17px}.legal-links button,.legal-links a{background:none;border:0;padding:3px;color:#b4c5e7;font:inherit;font-size:.8rem;text-decoration:underline;cursor:pointer}.funil-legal p{font-size:.75rem;color:#8e9aaa}.legal-panel{position:relative}.legal-panel h2{padding-right:35px}.legal-panel #legalClose{position:absolute;right:15px;top:12px;border:0;background:transparent;color:white;font-size:2rem}.legal-panel #legalDone{width:100%;padding:12px;border:0;border-radius:12px;background:#755bff;color:white;font-weight:800;margin-top:14px}@keyframes lockBob{50%{transform:translateY(-3px)}}@media(max-width:480px){.photo-privacy-panel,.legal-panel{padding:20px}.photo-privacy-panel li{font-size:.82rem}}</style></head>
+<body>
+
+<div class="auth-gate" id="authGate">
+ <div class="auth-box">
+  <div class="auth-brand"><div class="auth-logo">↗</div><span>FUNIL DE VENDAS</span></div>
+  <div id="authLoginPanel"><span class="auth-kicker">SUA CONTA NA NUVEM</span><h1>Bem-vindo</h1><p>Entre com seu usuário e senha para continuar em qualquer aparelho.</p>
+   <label>Usuário<input id="authUsername" autocomplete="username" placeholder="seu_usuario"></label>
+   <label>Senha<div class="password-wrap"><input id="authPassword" type="password" autocomplete="current-password" placeholder="Sua senha"><button id="togglePassword" type="button" aria-label="Mostrar senha"><span class="eye-icon"><i></i></span></button></div></label>
+   <button class="auth-primary" id="loginBtn" type="button">Entrar</button><button class="auth-link" id="showCreateBtn" type="button">Ainda não tenho conta • Criar conta</button><button class="auth-link muted" id="forgotBtn" type="button">Recuperar com código</button>
+  </div>
+  <div id="authCreatePanel" hidden><span class="auth-kicker">CRIAR CONTA</span><h1>Crie seu acesso</h1><p>Sem e-mail e sem confirmação. Escolha um usuário e uma senha.</p>
+   <label>Usuário<input id="createUsername" autocomplete="username" maxlength="24" placeholder="Ex.: minhaempresa"></label><label>Senha<div class="password-wrap"><input id="createPassword" type="password" autocomplete="new-password" placeholder="Mínimo de 6 caracteres"><button class="pw-eye" type="button" data-target="createPassword" aria-label="Mostrar senha"><span class="eye-icon"><i></i></span></button></div></label>
+   <button class="auth-primary" id="createBtn" type="button">Criar conta</button><button class="auth-link" id="backLoginBtn" type="button">Já tenho conta</button>
+  </div>
+  <div id="recoveryCodePanel" hidden><div class="code-icon">🔑</div><span class="auth-kicker">GUARDE ESTE CÓDIGO</span><h1>Código de recuperação</h1><p>Este código substitui o e-mail na recuperação da conta. Guarde em um lugar seguro.</p><div class="recovery-code" id="newRecoveryCode"></div><button class="auth-primary" id="savedCodeBtn" type="button">Já guardei meu código</button></div>
+  <div id="recoverPanel" hidden><span class="auth-kicker">RECUPERAR CONTA</span><h1>Nova senha</h1><p>Digite seu usuário e o código de recuperação criado junto com a conta.</p><label>Usuário<input id="recoverUsername" autocomplete="username"></label><label>Código<input id="recoverCode" maxlength="12" placeholder="XXXXXXXXXXXX"></label><label>Nova senha<div class="password-wrap"><input id="recoverPassword" type="password" autocomplete="new-password"><button class="pw-eye" type="button" data-target="recoverPassword" aria-label="Mostrar senha"><span class="eye-icon"><i></i></span></button></div></label><button class="auth-primary" id="recoverBtn" type="button">Trocar senha</button><button class="auth-link" id="recoverBackBtn" type="button">Voltar</button></div>
+  <div class="auth-message" id="authMessage"></div>
+ </div>
+</div>
+<div class="photo-privacy-overlay" id="photoPrivacyOverlay" role="dialog" aria-modal="true" aria-labelledby="photoPrivacyTitle" hidden><div class="photo-privacy-panel"><div class="photo-privacy-symbol" aria-hidden="true"><span class="photo-lock"></span></div><span class="photo-privacy-kicker">PRIVACIDADE E SEGURANÇA</span><h2 id="photoPrivacyTitle">Escolher foto de perfil</h2><p>Você controla quais fotos compartilha com o Funil de Vendas.</p><ul><li>O aplicativo abre o seletor de arquivos do seu aparelho somente se você permitir.</li><li>Você escolhe uma foto específica. O site não recebe acesso livre à sua galeria.</li><li>Se selecionar uma foto, ela poderá ser salva com seu perfil na nuvem para aparecer em outros aparelhos.</li><li>Você pode continuar sem foto. Não envie imagens com informações confidenciais.</li></ul><div class="photo-privacy-actions"><button type="button" id="photoPrivacyDeny">Não permitir</button><button type="button" id="photoPrivacyAllow">Escolher foto</button></div><small>Esta é uma confirmação do aplicativo; a seleção da foto é controlada pelo sistema do seu aparelho.</small></div></div>
+<div class="onboarding-gate" id="onboardingGate">
+ <div class="onboarding-box">
+  <div class="onboarding-progress"><i id="onboardingBar"></i></div>
+  <section class="on-step active" data-step="0">
+   <span class="auth-kicker">PRIMEIRO ACESSO</span><h1>Vamos conhecer você</h1><p>Essas respostas serão usadas para priorizar ideias, desafios e estratégias dentro do app.</p>
+   <div class="profile-photo-picker" id="onPhotoPicker"><img id="onPhotoPreview" alt=""><span id="onPhotoPlaceholder">＋</span></div><input id="onPhotoInput" type="file" accept="image/*" hidden>
+   <label>Como podemos te chamar?<input id="onName" maxlength="50" placeholder="Seu nome"></label>
+  </section>
+  <section class="on-step" data-step="1"><span class="step-count">1 DE 5</span><h2>Qual é seu principal objetivo?</h2><p>Escolha o resultado que você mais quer alcançar.</p><div class="choice-grid single" data-question="goal">
+   <button data-value="Ganhar dinheiro"><span class="q-ani money-ani"><i></i><em></em></span><b>Ganhar dinheiro</b><small>Aumentar vendas e faturamento</small></button><button data-value="Ganhar seguidores"><span class="q-ani growth-ani"><i></i><em></em></span><b>Ganhar seguidores</b><small>Crescer sua audiência</small></button><button data-value="Ser reconhecido"><span class="q-ani star-ani"><i></i></span><b>Ser reconhecido</b><small>Fortalecer sua marca</small></button><button data-value="Fazer networking"><span class="q-ani network-ani"><i></i><em></em></span><b>Fazer networking</b><small>Criar conexões e parcerias</small></button>
+  </div></section>
+  <section class="on-step" data-step="2"><span class="step-count">2 DE 5</span><h2>Onde você quer crescer primeiro?</h2><div class="choice-grid single" data-question="channel"><button data-value="Instagram">Instagram</button><button data-value="WhatsApp">WhatsApp</button><button data-value="TikTok">TikTok</button><button data-value="Presencial">Loja / presencial</button></div></section>
+  <section class="on-step" data-step="3"><span class="step-count">3 DE 5</span><h2>Qual é sua maior dificuldade hoje?</h2><div class="choice-grid single" data-question="difficulty"><button data-value="Atrair clientes">Atrair novos clientes</button><button data-value="Criar conteúdo">Criar conteúdo</button><button data-value="Converter vendas">Converter em vendas</button><button data-value="Ter constância">Manter constância</button></div></section>
+  <section class="on-step" data-step="4"><span class="step-count">4 DE 5</span><h2>Quanto tempo quer dedicar por dia?</h2><div class="choice-grid single" data-question="time"><button data-value="15 minutos">15 minutos</button><button data-value="30 minutos">30 minutos</button><button data-value="1 hora">1 hora</button><button data-value="Mais de 1 hora">Mais de 1 hora</button></div></section>
+  <section class="on-step" data-step="5"><span class="step-count">5 DE 5</span><h2>Que tipo de estratégia combina mais com você?</h2><div class="choice-grid single" data-question="style"><button data-value="Prática e rápida"><span class="q-ani speed-ani"><i></i></span> Prática e rápida</button><button data-value="Criativa e viral"><span class="q-ani viral-ani"><i></i><em></em></span> Criativa e viral</button><button data-value="Profissional e autoridade"><span class="q-ani target-ani"><i></i><em></em></span> Profissional e autoridade</button><button data-value="Relacionamento"><span class="q-ani chat-ani"><i></i></span> Relacionamento</button></div></section>
+  <section class="on-step" data-step="6"><div class="finish-icon">✓</div><span class="auth-kicker">PERFIL PRONTO</span><h1 id="onFinishTitle">Tudo pronto!</h1><p id="onFinishText">O Funil de Vendas agora vai priorizar estratégias alinhadas ao seu objetivo.</p></section>
+  <div class="on-actions"><button id="onBack" type="button">Voltar</button><button id="onNext" type="button">Continuar</button></div>
+ </div>
+</div>
+
+<div class="company-overlay" id="companyOverlay" onclick="closeCompanyMenu()"></div>
+<aside class="company-sidebar" id="companySidebar" aria-label="Menu lateral">
+  <div class="company-menu-head"><h2>Menu</h2><button class="company-close" type="button" onclick="closeCompanyMenu()">×</button></div>
+  <button class="company-menu-item" type="button" onclick="openFullProfilePage()"><span class="company-menu-icon profile-ani-icon" aria-hidden="true"><i></i></span><span>Perfil</span></button>
+      <button class="company-menu-item viral-menu-link" type="button" onclick="goToViralIdea()">
+        <span class="company-menu-icon bulb-ani-icon" aria-hidden="true"><i></i></span>
+        <span>Ideia viral do dia</span>
+      </button>
+      <button class="company-menu-item challenge-menu-link" type="button" onclick="goToDailyChallenge()">
+        <span class="company-menu-icon challenge-ani-icon" aria-hidden="true"><i></i></span>
+        <span>Desafio do dia</span>
+      </button>
+      <button class="company-menu-item settings-menu-link" type="button" onclick="openSettingsPage()">
+        <span class="company-menu-icon settings-ani-icon" aria-hidden="true"><i></i></span>
+        <span>Configurações</span>
+      </button>
+      <button class="company-menu-item support-menu-link" type="button" onclick="openSupportPage()">
+        <span class="company-menu-icon support-ani-icon" aria-hidden="true"><i></i></span>
+        <span>Suporte</span>
+      </button>
+  <div class="company-profile-panel" id="companyProfilePanel">
+    <div class="company-avatar-wrap">
+      <img class="company-avatar" id="companyAvatarPreview" alt="Foto da empresa">
+      <button class="company-photo-btn" type="button" onclick="document.getElementById('companyPhotoInput').click()">Escolher foto / logo</button>
+      <input id="companyPhotoInput" type="file" accept="image/*" hidden>
+    </div>
+    <label for="companyNameInput">Nome da empresa</label>
+    <input class="company-name-input" id="companyNameInput" type="text" maxlength="50" placeholder="Ex.: Minha Hamburgueria">
+    <button class="company-save" type="button" onclick="saveCompanyProfile()">Salvar perfil</button>
+    <div class="company-saved" id="companySaved">Perfil salvo ✓</div>
+  </div>
+</aside>
+
+
+  <div class="real-action-modal" id="realActionModal" onclick="closeRealActionModal(event)">
+    <div class="real-action-box">
+      <button class="real-action-close" type="button" onclick="hideRealActionModal()">×</button>
+      <span class="real-action-stage" id="realActionStage">Etapa</span>
+      <h3 id="realActionTitle">Exemplo real</h3>
+      <p id="realActionText"></p>
+      <div class="real-action-example" id="realActionExample"></div>
+      <div class="real-action-tip" id="realActionTip"></div>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <div class="container nav-inner">
+      <div class="logo"><img id="companyHeaderLogo" class="header-brand-logo" alt="Logo da empresa"> <span id="companyHeaderName">Seu perfil</span></div>
+      <div class="links">
+        <a href="#topo">Topo</a><a href="#meio">Meio</a><a href="#fundo">Fundo</a><a href="#fidelizacao">Fidelização</a>
+      </div>
+      <button class="menu-toggle" type="button" onclick="openCompanyMenu()" aria-label="Abrir menu">☰</button>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="welcome-company">Bem-vindo, <strong id="companyWelcomeName">visitante</strong>! Qual a próxima estratégia?</div>
+    <div class="container hero-grid">
+      <div>
+        <span class="badge"><span class="ani-icon icon-chart" aria-hidden="true"><i></i></span> Estrutura de Vendas</span>
+        <h1>Funil completo para vender <span class="gradient">mais todos os dias</span></h1>
+        <p class="lead">Do público frio até a recompra: uma página visual com ações de marketing offline, digital, atendimento, conversão e fidelização.</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="#topo">Ver estratégia</a>
+          <a class="btn btn-secondary" href="#fidelizacao">Ir para fidelização</a>
+        </div>
+      </div>
+      <div class="funnel-card">
+        <div class="funnel">
+          <div class="slice s1">Topo do Funil</div>
+          <div class="slice s2">Meio do Funil</div>
+          <div class="slice s3">Fundo do Funil</div>
+          <div class="slice s4">Fidelização</div>
+        </div>
+        <p class="lead" style="font-size:1rem;margin:0;text-align:center">Atrair → Relacionar → Converter → Fazer voltar</p>
+        <div class="money"><span class="animated-icon"><span class="ani-icon icon-money" aria-hidden="true"><i></i></span></span></div>
+      </div>
+    </div>
+  </header>
+
+  
+
+
+<section class="support-page" id="supportPage" aria-hidden="true">
+ <div class="support-shell">
+  <div class="support-head">
+   <button class="support-back" id="supportBackBtn" type="button" aria-label="Voltar">‹</button>
+   <div><span class="support-kicker">CENTRAL DE AJUDA</span><h1>Suporte</h1><p>Precisa de ajuda com o Funil de Vendas? Veja as orientações antes de entrar em contato.</p></div>
+  </div>
+
+  <article class="support-contact-card">
+   <div class="support-mail-icon"><i></i></div>
+   <div class="support-contact-copy"><span>CANAL OFICIAL DE SUPORTE</span><h2>precificafoodsuporte@gmail.com</h2><p>Use este e-mail para dúvidas, dificuldades técnicas e problemas relacionados ao funcionamento do aplicativo.</p></div>
+   <a class="support-email-btn" href="mailto:precificafoodsuporte@gmail.com?subject=Suporte%20-%20Funil%20de%20Vendas">Enviar e-mail</a>
+  </article>
+
+  <div class="support-section-title"><span>ANTES DE ENTRAR EM CONTATO</span><h2>Regras do suporte</h2></div>
+  <div class="support-rules">
+   <article><b>01</b><div><h3>Explique o problema com clareza</h3><p>Informe o que aconteceu, em qual área do aplicativo ocorreu e o que você estava tentando fazer.</p></div></article>
+   <article><b>02</b><div><h3>Envie prints quando possível</h3><p>Capturas de tela ajudam a identificar o problema mais rapidamente. Não envie senhas ou informações financeiras.</p></div></article>
+   <article><b>03</b><div><h3>Use somente o canal oficial</h3><p>O suporte oficial deste produto é feito pelo e-mail informado nesta página.</p></div></article>
+   <article><b>04</b><div><h3>Não envie dados sensíveis</h3><p>Nunca envie senhas, códigos de acesso, dados bancários ou outras informações confidenciais por e-mail.</p></div></article>
+   <article><b>05</b><div><h3>Descreva seu aparelho e navegador</h3><p>Em erros técnicos, informe se está usando Android, iPhone ou computador e qual navegador está utilizando.</p></div></article>
+   <article><b>06</b><div><h3>Envie uma solicitação por problema</h3><p>Evite vários e-mails sobre a mesma ocorrência. Isso ajuda a manter o atendimento organizado.</p></div></article>
+  </div>
+
+  <article class="support-check-card">
+   <span class="support-check-icon">✓</span>
+   <div><h3>Antes de reportar um erro</h3><p>Feche e abra novamente o aplicativo, confira sua conexão com a internet e tente repetir a ação. Se o problema continuar, entre em contato com o suporte.</p></div>
+  </article>
+
+  <article class="support-security-card">
+   <div class="support-lock">🔒</div><div><strong>Segurança em primeiro lugar</strong><p>O suporte nunca deve precisar da sua senha para analisar um problema. Proteja seus dados de acesso.</p></div>
+  </article>
+ </div>
+</section>
+
+<section class="settings-page" id="settingsPage" aria-hidden="true">
+ <div class="settings-shell">
+  <div class="settings-head">
+   <button class="settings-back" id="settingsBackBtn" type="button">‹</button>
+   <div><span class="settings-kicker">PERSONALIZAÇÃO</span><h1>Configurações</h1><p>Deixe o Funil de Vendas com a sua cara e escolha como ele deve se comportar.</p></div>
+  </div>
+
+  <div class="settings-grid">
+   <article class="settings-card">
+    <div class="settings-card-title"><span class="settings-card-icon">◐</span><div><h2>Aparência</h2><p>Escolha o visual do aplicativo.</p></div></div>
+    <div class="theme-options">
+     <button type="button" class="theme-choice" data-theme-choice="dark"><i class="theme-preview dark"></i><span>Escuro</span></button>
+     <button type="button" class="theme-choice" data-theme-choice="light"><i class="theme-preview light"></i><span>Claro</span></button>
+     <button type="button" class="theme-choice" data-theme-choice="system"><i class="theme-preview system"></i><span>Sistema</span></button>
+    </div>
+   </article>
+
+   <article class="settings-card">
+    <div class="settings-card-title"><span class="settings-card-icon">Aa</span><div><h2>Tamanho do texto</h2><p>Ajuste a leitura sem alterar seus dados.</p></div></div>
+    <div class="font-options">
+     <button type="button" data-font="small">A <small>Compacto</small></button>
+     <button type="button" data-font="normal">A <small>Padrão</small></button>
+     <button type="button" data-font="large">A <small>Grande</small></button>
+    </div>
+   </article>
+
+   <article class="settings-card">
+    <div class="settings-card-title"><span class="settings-card-icon motion-icon">↟</span><div><h2>Animações</h2><p>Controle os movimentos dos ícones e elementos.</p></div></div>
+    <label class="setting-row"><div><strong>Animações do site</strong><small>Desative para uma experiência mais estática.</small></div><input id="animationsSetting" type="checkbox"><span class="setting-switch"></span></label>
+   </article>
+
+   <article class="settings-card">
+    <div class="settings-card-title"><span class="settings-card-icon">✓</span><div><h2>Confirmações</h2><p>Evite alterações acidentais.</p></div></div>
+    <label class="setting-row"><div><strong>Confirmar exclusões</strong><small>Exibe confirmação antes de apagar itens.</small></div><input id="confirmDeleteSetting" type="checkbox"><span class="setting-switch"></span></label>
+   </article>
+
+   <article class="settings-card settings-wide">
+    <div class="settings-card-title"><span class="settings-card-icon">⌂</span><div><h2>Página inicial</h2><p>Escolha qual área abrir primeiro quando entrar no Funil.</p></div></div>
+    <select id="startPageSetting">
+      <option value="home">Funil de Vendas</option>
+      <option value="viral">Ideia viral do dia</option>
+      <option value="challenge">Desafio do dia</option>
+      <option value="profile">Perfil</option>
+    </select>
+   </article>
+
+   <article class="settings-card settings-wide">
+    <div class="settings-card-title"><span class="settings-card-icon">↺</span><div><h2>Dados e preferências</h2><p>As configurações são salvas neste navegador.</p></div></div>
+    <button class="reset-settings-btn" id="resetSettingsBtn" type="button">Restaurar configurações padrão</button>
+   </article>
+  </div>
+
+  <article class="settings-card settings-wide account-logout-card">
+    <div class="settings-card-title"><span class="settings-card-icon">⇥</span><div><h2>Minha conta</h2><p>Encerre sua sessão neste aparelho sem excluir seu perfil ou dados salvos na nuvem.</p></div></div>
+    <button id="funilLogoutBtn" type="button" class="funil-logout-btn">Sair da conta · Voltar ao login</button>
+  </article>
+  <div class="settings-saved" id="settingsSaved">✓ Configurações salvas</div>
+ </div>
+</section>
+
+<div class="reset-settings-modal" id="resetSettingsModal">
+ <div class="reset-settings-box">
+  <div class="reset-settings-symbol">↺</div><span>RESTAURAR</span><h3>Voltar ao padrão?</h3>
+  <p>Isso redefine apenas as configurações visuais. Seu perfil, metas, medalhas e desafios não serão apagados.</p>
+  <div><button id="cancelResetSettings" type="button">Cancelar</button><button id="confirmResetSettings" type="button">Restaurar</button></div>
+ </div>
+</div>
+
+<div id="funilLogoutModal" class="funil-logout-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="funilLogoutTitle">
+ <div class="funil-logout-dialog"><div class="funil-logout-symbol">⇥</div><h2 id="funilLogoutTitle">Sair da conta?</h2><p>Você voltará à tela de login. Seu perfil, suas metas e seus desafios continuarão salvos na conta.</p><div class="funil-logout-actions"><button id="funilLogoutCancel" type="button">Cancelar</button><button id="funilLogoutConfirm" type="button">Sim, sair</button></div></div>
+</div>
+<section class="full-profile-page" id="fullProfilePage" aria-hidden="true">
+  <div class="profile-page-shell">
+    <div class="profile-page-head">
+      <button class="profile-back-btn" id="profileBackBtn" type="button" aria-label="Voltar">‹</button>
+      <div>
+        <span class="profile-page-kicker">SEU ESPAÇO</span>
+        <h1>Perfil da empresa</h1>
+        <p>Personalize sua empresa, defina metas e acompanhe suas conquistas.</p>
+      </div>
+    </div>
+
+    <div class="profile-grid">
+      <article class="profile-card identity-card">
+        <div class="profile-photo-wrap">
+          <img id="fullProfilePhoto" alt="Foto da empresa">
+          <div class="profile-photo-fallback" id="fullProfileFallback">🏪</div>
+        </div>
+        <div class="profile-identity-fields">
+          <label for="fullCompanyName">Nome da empresa</label>
+          <input id="fullCompanyName" type="text" maxlength="60" placeholder="Nome da sua empresa">
+          <button class="profile-photo-btn" id="chooseProfilePhotoBtn" type="button">Escolher foto / logo</button>
+          <input id="fullProfilePhotoInput" type="file" accept="image/*" hidden>
+          <button class="profile-save-btn" id="saveFullProfileBtn" type="button">Salvar perfil</button>
+          <small id="profileSaveStatus" aria-live="polite"></small>
+        </div>
+      </article>
+
+      <article class="profile-card goal-card">
+  <span class="profile-section-tag">SUAS METAS</span>
+  <h2>Metas para sua empresa</h2>
+  <p>Cadastre quantas metas quiser. Elas ficam pendentes até você realmente conquistá-las.</p>
+  <textarea id="companyGoalInput" maxlength="180" placeholder="Ex.: alcançar R$ 30.000 de faturamento no mês"></textarea>
+  <button class="add-goal-btn" id="addCompanyGoalBtn" type="button">＋ Adicionar meta</button>
+  <div class="pending-goals-head"><strong>Metas em andamento</strong><span id="pendingGoalCount">0</span></div>
+  <div class="pending-goals-empty" id="pendingGoalsEmpty">Nenhuma meta em andamento.</div>
+  <div class="pending-goals-list" id="pendingGoalsList"></div>
+</article>
+    </div>
+
+    <article class="profile-card achievements-card">
+      <div class="achievements-head">
+        <div><span class="profile-section-tag">HISTÓRICO</span><h2>Metas conquistadas</h2></div>
+        <div class="achievement-total"><strong id="achievementCount">0</strong><span>medalhas</span></div>
+      </div>
+      <div class="achievement-empty" id="achievementEmpty">Sua primeira medalha vai aparecer aqui quando você conquistar uma meta.</div>
+      <div class="achievement-grid" id="achievementGrid"></div>
+    </article>
+
+    <div class="profile-stats">
+      <article><strong id="profileTrophyStat">0</strong><span>Desafios concluídos</span><small>Consistência diária</small></article>
+      <article><strong id="profileMedalStat">0</strong><span>Metas conquistadas</span><small>Grandes objetivos</small></article>
+      <article><strong id="profileMemberSince">Hoje</strong><span>Jornada iniciada</span><small>Continue evoluindo</small></article>
+    </div>
+
+    <article class="profile-card profile-tip-card">
+      <div class="profile-tip-icon">✦</div>
+      <div><strong>Seu progresso também faz parte da estratégia.</strong><p>Use os desafios diários para criar constância e as metas para registrar os grandes marcos da empresa.</p></div>
+    </article>
+  </div>
+</section>
+
+<div class="gallery-consent-modal" id="galleryConsentModal" aria-hidden="true">
+  <div class="gallery-consent-box" role="dialog" aria-modal="true" aria-labelledby="galleryConsentTitle">
+    <div class="gallery-lock">🔒</div>
+    <h3 id="galleryConsentTitle">Acessar sua galeria?</h3>
+    <p>O site abrirá o seletor de imagens do seu aparelho somente se você aceitar. A foto escolhida fica salva neste navegador e não é enviada automaticamente para nenhum servidor.</p>
+    <div class="gallery-consent-actions">
+      <button type="button" class="deny" id="denyGalleryBtn">Não permitir</button>
+      <button type="button" class="allow" id="allowGalleryBtn">Permitir acesso</button>
+    </div>
+  </div>
+</div>
+
+<main>
+    <section class="container">
+      <h2 class="section-title">Visão geral</h2>
+      <p class="section-sub">Cada etapa tem um papel claro. O topo chama atenção, o meio cria confiança, o fundo facilita a compra e a fidelização aumenta a recompra.</p>
+      <div class="grid">
+        <div class="card"><div class="icon"><span class="ani-icon icon-cold" aria-hidden="true"><i></i></span></div><h3>Público frio</h3><p>Pessoas que ainda não conhecem a marca. Aqui o foco é aparecer, chamar atenção e gerar curiosidade.</p><span class="tag">Topo</span></div>
+        <div class="card"><div class="icon"><span class="ani-icon icon-fire" aria-hidden="true"><i></i></span></div><h3>Público quente</h3><p>Leads que já interagiram pelo Instagram, WhatsApp, site ou delivery e estão prontos para receber oferta.</p><span class="tag">Meio/Fundo</span></div>
+        <div class="card"><div class="icon"><span class="ani-icon icon-recycle" aria-hidden="true"><i></i></span></div><h3>Clientes fiéis</h3><p>Clientes que compraram e precisam de motivos para voltar: pontos, grupos, sorteios, ofertas e experiência.</p><span class="tag">Fidelização</span></div>
+      </div>
+
+      </div>
+
+
+      <div class="mini-funnel-demo">
+        <h3 class="mini-funnel-title">Como um vídeo vira venda</h3>
+        <p class="mini-funnel-sub">Um vídeo atrai pessoas no topo do funil através do Instagram, Reels e anúncios. No meio do funil, os clientes entram no WhatsApp, visualizam o cardápio, interagem com promoções e começam a criar interesse pela marca. No fundo do funil, a oferta certa faz o cliente finalizar o pedido e gerar uma nova venda.</p>
+        <div class="mini-funnel-stage">
+          <div class="flow-line"></div>
+          <div class="flow-pulse"></div>
+          <div class="video-chip"><span class="phone-views-css"></span>1 mil views</div>
+          <div class="mini-funnel-shape">
+            <div class="mini-slice mini-top">Topo do funil</div>
+            <div class="mini-slice mini-mid">Meio do funil</div>
+            <div class="mini-slice mini-bottom">Fundo do funil</div>
+          </div>
+          <div class="sale-chip"><span class="coin-sale-css"></span>+1 venda</div>
+        </div>
+      </div>
+
+    </section>
+
+    <section id="topo" class="container stage topo">
+      <div class="stage-head"><div class="stage-number">01</div><h2>Topo do Funil - Chamar atenção</h2></div>
+      <p class="section-sub">Regra número 1: chamar atenção a todo custo. Use canais offline e digitais para aumentar alcance e gerar primeiras impressões.</p>
+      <div class="list">
+        <div class="item"><span class="ani-icon icon-megaphone" aria-hidden="true"><i></i></span> Panfletagem<small>Divulgação local direta</small></div>
+        <div class="item"><span class="animated-icon"><span class="ani-icon icon-bolt" aria-hidden="true"><i></i></span></span> Marketing de guerrilha<small>Ações criativas na rua</small></div>
+        <div class="item"><span class="ani-icon icon-target" aria-hidden="true"><i></i></span> Eventos<small>Presença em ações e bairros</small></div>
+        <div class="item"><span class="ani-icon icon-chat" aria-hidden="true"><i></i></span> Boca a boca<small>Cliente indicando cliente</small></div>
+        <div class="item"><span class="ani-icon icon-music" aria-hidden="true"><i></i></span> Rádio<small>Alcance regional</small></div>
+        <div class="item"><span class="ani-icon icon-leaf" aria-hidden="true"><i></i></span> Marketing verde<small>Posicionamento e comunidade</small></div>
+        <div class="item"><span class="ani-icon icon-money" aria-hidden="true"><i></i></span> Tráfego pago<small>Anúncios para público local</small></div>
+        <div class="item"><span class="animated-icon"><span class="ani-icon icon-phone" aria-hidden="true"><i></i></span></span> Redes sociais<small>Instagram, Facebook e afins</small></div>
+        <div class="item"><span class="ani-icon icon-video" aria-hidden="true"><i></i></span> Criação de conteúdo<small>Reels, storytelling e enquetes</small></div>
+        <div class="item"><span class="ani-icon icon-rocket" aria-hidden="true"><i></i></span> Marketing viral<small>Ideias compartilháveis</small></div>
+        <div class="item"><span class="ani-icon icon-search" aria-hidden="true"><i></i></span> Google e site<small>Busca local e cardápio online</small></div>
+        <div class="item"><span class="ani-icon icon-partner" aria-hidden="true"><i></i></span> Co-marketing<small>Parcerias com lojas e bloqueiros</small></div>
+      </div>
+    </section>
+
+    <section id="meio" class="container stage meio">
+      <div class="stage-head"><div class="stage-number">02</div><h2>Meio do Funil - Criar relacionamento</h2></div>
+      <p class="section-sub">Aqui o lead já viu a marca. Agora você prova valor, aproxima, mostra bastidores, atende bem e prepara o cliente para comprar.</p>
+      <div class="list">
+        <div class="item"><span class="ani-icon icon-phone" aria-hidden="true"><i></i></span> Stories <span class="arrow">→</span> Foodporn <span class="arrow">→</span> Prova social<small>Conteúdo que dá vontade e gera confiança</small></div>
+        <div class="item"><span class="ani-icon icon-spark" aria-hidden="true"><i></i></span> Primeiras impressões<small>Visual do site, perfil, WhatsApp e cardápio</small></div>
+        <div class="item"><span class="ani-icon icon-bolt" aria-hidden="true"><i></i></span> Real time<small>Atendimento rápido e humano</small></div>
+        <div class="item"><span class="ani-icon icon-magnet" aria-hidden="true"><i></i></span> Inbound marketing<small>Blogs, receitas, dicas e conteúdo útil</small></div>
+        <div class="item"><span class="ani-icon icon-chat" aria-hidden="true"><i></i></span> Marketing sazonal/social<small>Datas comemorativas e temas do momento</small></div>
+        <div class="item"><span class="ani-icon icon-gift" aria-hidden="true"><i></i></span> Bônus e ofertas<small>Promoções, sorteios e novidades</small></div>
+        <div class="item"><span class="ani-icon icon-click" aria-hidden="true"><i></i></span> Chamada para ação<small>Links de “clique aqui” e copy matadora</small></div>
+      </div>
+    </section>
+
+    <section id="fundo" class="container stage fundo">
+      <div class="stage-head"><div class="stage-number">03</div><h2>Fundo do Funil - Converter em venda</h2></div>
+      <p class="section-sub">O cliente está quente. Remova atritos, fortaleça a decisão e entregue uma experiência que faça a pessoa comprar agora.</p>
+      <div class="list">
+        <div class="item"><span class="ani-icon icon-star" aria-hidden="true"><i></i></span> Experiência do cliente<small>Bom atendimento em todos os canais</small></div>
+        <div class="item"><span class="ani-icon icon-burger" aria-hidden="true"><i></i></span> Qualidade do produto<small>Sabor, padrão e apresentação</small></div>
+        <div class="item"><span class="ani-icon icon-list" aria-hidden="true"><i></i></span> Cardápio irresistível<small>Produtos claros, fotos e descrições</small></div>
+        <div class="item"><span class="animated-icon"><span class="ani-icon icon-money" aria-hidden="true"><i></i></span></span> Preços estratégicos<small>Combos, ancoragem e ofertas</small></div>
+        <div class="item"><span class="ani-icon icon-card" aria-hidden="true"><i></i></span> Pagamento facilitado<small>Menos barreira para finalizar</small></div>
+        <div class="item"><span class="ani-icon icon-gift" aria-hidden="true"><i></i></span> Embalagem incrível<small>Brindes, mimos e surpresa</small></div>
+        <div class="item"><span class="ani-icon icon-clock" aria-hidden="true"><i></i></span> Tempo de entrega<small>Se atrasar, pedir desculpas e compensar</small></div>
+        <div class="item"><span class="ani-icon icon-chart" aria-hidden="true"><i></i></span> Feedback e pesquisa<small>Aprender com o cliente</small></div>
+        <div class="item"><span class="ani-icon icon-chart" aria-hidden="true"><i></i></span> Marketing de performance<small>ROI e retorno de investimento</small></div>
+        <div class="item"><span class="ani-icon icon-recycle" aria-hidden="true"><i></i></span> Remarketing<small>Recuperar venda perdida</small></div>
+      </div>
+    </section>
+
+    <section id="fidelizacao" class="container stage fidel">
+      <div class="stage-head"><div class="stage-number">04</div><h2>Fidelização - Fazer o cliente voltar</h2></div>
+      <p class="section-sub">Depois da primeira compra, a estratégia vira recorrência: relacionamento, benefício e experiência memorável.</p>
+      <div class="list">
+        <div class="item"><span class="ani-icon icon-trophy" aria-hidden="true"><i></i></span> Programa de pontos<small>A cada 10 compras, um presente</small></div>
+        <div class="item"><span class="ani-icon icon-dice" aria-hidden="true"><i></i></span> Sorteios<small>Motivo para acompanhar a marca</small></div>
+        <div class="item"><span class="ani-icon icon-heart" aria-hidden="true"><i></i></span> Grupo de ofertas<small>Promoções exclusivas</small></div>
+        <div class="item"><span class="ani-icon icon-partner" aria-hidden="true"><i></i></span> Confiança e respeito<small>Base para recompra</small></div>
+        <div class="item"><span class="ani-icon icon-game" aria-hidden="true"><i></i></span> Game marketing<small>Experiências divertidas e interativas</small></div>
+        <div class="item"><span class="ani-icon icon-feedback" aria-hidden="true"><i></i></span> Feedback<small>Pesquisa para melhorar sempre</small></div>
+      </div>
+    </section>
+
+    <section class="container">
+      <div class="practice-panel">
+        <h2>Exemplo do Plano na prática</h2>
+        <p>Empresas fortes repetem o funil todos os dias: aparecem com conteúdo, criam desejo, facilitam o pedido e fazem o cliente voltar.</p>
+        <div class="daily-proof">Dica do dia: <span id="dailyPracticeTip" class="daily-tip">Carregando estratégia...</span><small>O próprio site troca automaticamente a dica conforme o dia do mês.</small></div>
+        <div class="practice-examples">
+          <div class="practice-card topo"><strong>Topo do funil</strong><small>McDonald's, Burger King e pequenas hamburguerias usam vídeos curtos, campanhas locais, humor e lançamentos para chamar atenção de quem ainda não decidiu onde comer.</small></div>
+          <div class="practice-card meio"><strong>Meio do funil</strong><small>Marcas como Starbucks, Domino's e restaurantes locais aproximam o cliente com bastidores, prova social, avaliações, WhatsApp, cardápio online e respostas rápidas.</small></div>
+          <div class="practice-card fundo"><strong>Fundo do funil</strong><small>iFood, Domino's e redes de fast-food convertem com combos, cupons, fotos boas, botão de pedido fácil, pagamento simples e oferta clara no momento certo.</small></div>
+          <div class="practice-card fidel"><strong>Fidelização</strong><small>Starbucks Rewards, programas de pontos, grupos VIP no WhatsApp e ofertas exclusivas fazem o cliente comprar de novo, indicar amigos e acompanhar a marca.</small></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+    <section class="daily-viral-panel" id="ideia-viral-do-dia">
+      <h2>Ideia viral do dia</h2>
+      <p>Todos os dias o site mostra uma ideia de marketing inspirada em ações que fizeram sucesso no Brasil e no mundo, com uma lição prática para adaptar para você ou sua empresa.</p>
+
+      <div class="daily-viral-card">
+        <span class="daily-viral-tag" id="dailyViralTag">Marketing criativo</span>
+        <h3 id="dailyViralTitle">Carregando ideia viral...</h3>
+        <small id="dailyViralStory"></small>
+        <div class="daily-viral-lesson" id="dailyViralLesson"></div>
+        <div class="daily-viral-date" id="dailyViralDate"></div>
+      </div>
+
+      <div class="daily-viral-actions">
+        <button type="button" onclick="nextDailyViralIdea()">Ver outra ideia</button>
+      </div>
+    </section>
+
+
+  
+
+<section class="daily-challenge-panel challenge-agenda" id="desafio-do-dia">
+  <div class="agenda-top">
+    <div>
+      <span class="daily-challenge-kicker">AGENDA DE ESTRATÉGIA</span>
+      <h2>Desafio do dia</h2>
+    </div>
+    <div class="agenda-date">
+      <strong id="challengeDay">--</strong>
+      <span id="challengeMonth">---</span>
+      <small id="challengeWeekday">Hoje</small>
+    </div>
+  </div>
+
+  <div class="agenda-line"></div>
+
+  <div class="daily-challenge-card">
+    <div class="daily-challenge-icon" aria-hidden="true"><i></i></div>
+    <div class="challenge-copy">
+      <span class="challenge-label">OBJETIVO DE HOJE</span>
+      <h3 id="dailyChallengeTitle">Carregando objetivo...</h3>
+      <small id="dailyChallengeText"></small>
+      <div class="daily-challenge-goal" id="dailyChallengeGoal"></div>
+    </div>
+  </div>
+
+  <button class="challenge-complete-btn" id="challengeCompleteBtn" type="button">
+    <span class="check-circle">✓</span>
+    <span id="challengeCompleteText">Objetivo concluído</span>
+  </button>
+
+  <div class="challenge-trophy" id="challengeTrophy" aria-live="polite">
+    <div class="trophy-cup">🏆</div>
+    <div><strong>Troféu conquistado!</strong><small>Objetivo de hoje concluído. Amanhã uma nova missão estará esperando por você.</small></div>
+  </div>
+
+  <div class="challenge-history">
+    <div><strong id="challengeTrophyCount">0</strong><span>Troféus conquistados</span></div>
+    <div><strong id="challengeStreak">0</strong><span>Dias concluídos</span></div>
+  </div>
+</section>
+
+
+<footer>
+    <div class="container">Funil de Vendas • Estratégia que gera resultado</div>
+  <section id="funilLegal" class="funil-legal container" aria-label="Informações legais"><div class="legal-links"><button type="button" data-legal="privacy">Privacidade</button><button type="button" data-legal="terms">Termos de uso</button><button type="button" data-legal="security">Segurança</button><button type="button" data-legal="cookies">Armazenamento local</button><a href="mailto:precificafoodsuporte@gmail.com?subject=Privacidade%20-%20Funil%20de%20Vendas">Contato e direitos sobre dados</a></div><p>© <span id="funilCopyrightYear"></span> Funil de Vendas. Conteúdo educativo de marketing. Resultados não são garantidos.</p></section><div id="legalModal" class="legal-modal" hidden role="dialog" aria-modal="true" aria-labelledby="legalModalTitle"><div class="legal-panel"><button type="button" id="legalClose" aria-label="Fechar">×</button><h2 id="legalModalTitle"></h2><div id="legalModalBody"></div><button type="button" id="legalDone">Entendi</button></div></div></footer>
+
+<script id="daily-practice-rotation-script">
+(function(){
+  const tips = [
+    "Topo: grave um Reels mostrando o hambúrguer sendo finalizado na chapa.",
+    "Meio: responda directs e leve o cliente para o WhatsApp com uma oferta simples.",
+    "Fundo: destaque um combo com foto boa, preço claro e botão de pedido.",
+    "Fidelização: envie uma oferta exclusiva para quem já comprou esta semana.",
+    "Topo: poste bastidores da cozinha para gerar curiosidade e confiança.",
+    "Meio: publique prints de avaliações e depoimentos reais dos clientes.",
+    "Fundo: facilite o fechamento com cardápio direto, pagamento simples e entrega clara.",
+    "Fidelização: crie um grupo VIP com promoções limitadas para clientes fiéis.",
+    "Topo: use humor local ou trend do momento para atrair novas pessoas.",
+    "Meio: mostre o diferencial do produto: pão, carne, molho, embalagem e atendimento.",
+    "Fundo: use escassez real, como combo do dia ou quantidade limitada.",
+    "Fidelização: peça feedback após a compra e ofereça um mimo na próxima visita."
+  ];
+
+  const today = new Date();
+  const index = today.getDate() % tips.length;
+  const target = document.getElementById("dailyPracticeTip");
+
+  if(target){
+    target.textContent = tips[index];
+  }
+})();
+</script>
+
+
+
+
+
+
+<script id="daily-viral-idea-script">
+(function(){
+  const ideas = [
+    {
+      tag:"Burger King",
+      title:"Provocação contra concorrente",
+      story:"O Burger King ficou conhecido por usar humor e provocações inteligentes em campanhas contra concorrentes, gerando conversa orgânica nas redes.",
+      lesson:"Faça posts bem-humorados comparando situações do dia a dia, sem atacar ninguém diretamente. Exemplo: quando você promete pedir só uma batata e acaba pedindo combo completo."
+    },
+    {
+      tag:"McDonald's",
+      title:"Produtos sazonais viram evento",
+      story:"O McDonald's usa lançamentos limitados e produtos sazonais para criar urgência, fila, comentário e vontade de experimentar antes que acabe.",
+      lesson:"Crie o combo da semana ou o molho secreto de sexta, com tempo limitado e contagem regressiva nos stories."
+    },
+    {
+      tag:"Starbucks",
+      title:"Nome no copo e personalização",
+      story:"A Starbucks transformou um detalhe simples, o nome no copo, em experiência compartilhável e memorável.",
+      lesson:"Escreva frases engraçadas nas embalagens ou mande bilhetes personalizados para clientes fiéis."
+    },
+    {
+      tag:"Nubank",
+      title:"Atendimento que vira história",
+      story:"O Nubank cresceu muito com histórias de atendimento humano, rápido e surpreendente, que os clientes compartilhavam espontaneamente.",
+      lesson:"Resolva problemas com carinho e transforme isso em bastidor: hoje erramos, corrigimos e ainda mandamos um mimo."
+    },
+    {
+      tag:"Coca-Cola",
+      title:"Compartilhe uma Coca",
+      story:"A campanha com nomes nas garrafas fez as pessoas procurarem seu próprio nome e compartilharem fotos, gerando participação massiva.",
+      lesson:"Crie combos com nomes de clientes, bairros ou situações: Combo do João, Combo da firma, Combo pós-trampo."
+    },
+    {
+      tag:"iFood",
+      title:"Cupom e urgência",
+      story:"Apps de delivery usam cupons, notificações e ofertas relâmpago para estimular decisão rápida.",
+      lesson:"Publique ofertas com validade real: válido até 20h30 ou só para os 15 primeiros pedidos no WhatsApp."
+    },
+    {
+      tag:"Oreo",
+      title:"Resposta rápida ao momento",
+      story:"A Oreo ficou famosa por aproveitar acontecimentos em tempo real com posts simples, rápidos e criativos.",
+      lesson:"Use clima, jogo, chuva, calor, memes e acontecimentos da cidade para postar ofertas contextuais."
+    },
+    {
+      tag:"Red Bull",
+      title:"Marca como entretenimento",
+      story:"A Red Bull virou referência ao criar conteúdo e eventos que parecem entretenimento, não apenas propaganda.",
+      lesson:"Transforme bastidores da cozinha em série: correria da chapa, pedido misterioso, desafio do molho."
+    },
+    {
+      tag:"Dove",
+      title:"Campanha com propósito",
+      story:"A Dove fez campanhas globais fortes usando autoestima, verdade e identificação emocional.",
+      lesson:"Mostre pessoas reais da equipe, clientes reais e histórias reais da hamburgueria para gerar conexão."
+    },
+    {
+      tag:"Netflix",
+      title:"Linguagem de meme",
+      story:"A Netflix usa humor, memes e linguagem da internet para parecer próxima do público.",
+      lesson:"Poste como pessoa, não como empresa. Use frases de cliente, memes de fome e situações engraçadas do delivery."
+    },
+    {
+      tag:"Magazine Luiza",
+      title:"Personagem de marca",
+      story:"A Magalu fortaleceu a marca criando uma personagem digital reconhecível e constante.",
+      lesson:"Crie um personagem da sua marca: o atendente engraçado, o mestre da chapa ou o cliente faminto."
+    },
+    {
+      tag:"Pepsi",
+      title:"Desafio e participação",
+      story:"Marcas de bebida usam desafios, collabs e participação do público para aumentar alcance.",
+      lesson:"Crie desafios simples: marque quem não divide batata, dueto mordida perfeita, melhor reação ao lanche."
+    },
+    {"tag": "Prova social", "title": "Cliente contando a experiência", "story": "Depoimentos espontâneos reduzem a dúvida de quem ainda não conhece o negócio.", "lesson": "Peça autorização a um cliente satisfeito e publique um vídeo curto mostrando o pedido e a opinião real."},
+    {"tag": "Bastidores", "title": "Do ingrediente ao pedido", "story": "Mostrar a preparação aproxima o público e dá transparência ao trabalho.", "lesson": "Grave três cenas rápidas: ingredientes, montagem e embalagem; finalize com o prato pronto."},
+    {"tag": "Enquete", "title": "Público escolhe o próximo sabor", "story": "Votações fazem os seguidores participar das decisões da marca.", "lesson": "Abra uma enquete com dois sabores possíveis e anuncie o vencedor no dia seguinte."},
+    {"tag": "Parceria local", "title": "Combo com comércio vizinho", "story": "Parcerias entre negócios próximos podem apresentar a marca a novos públicos.", "lesson": "Convide uma cafeteria ou loja do bairro para uma ação conjunta com divulgação nos dois perfis."},
+    {"tag": "Indicação", "title": "Amigo indica amigo", "story": "Clientes satisfeitos podem ajudar a atrair novas pessoas por recomendação.", "lesson": "Crie um benefício simples e transparente para clientes que indicarem um novo comprador."},
+    {"tag": "Tutorial", "title": "Como aproveitar melhor o produto", "story": "Conteúdo útil faz a marca ser lembrada além das ofertas.", "lesson": "Mostre em 20 segundos como combinar molhos, acompanhamentos ou montar um pedido ideal."},
+    {"tag": "Antes e depois", "title": "Transformação da cozinha", "story": "Processos de preparação geram curiosidade quando apresentados com ritmo.", "lesson": "Mostre a bancada antes do expediente e a primeira leva de pedidos prontos."},
+    {"tag": "História real", "title": "Quem está por trás do negócio", "story": "Pessoas se conectam com histórias humanas e autênticas.", "lesson": "Conte em vídeo como a empresa começou e mostre uma foto antiga com autorização."},
+    {"tag": "Pergunta curiosa", "title": "A escolha impossível", "story": "Perguntas fáceis de responder estimulam comentários.", "lesson": "Pergunte: você prefere batata extra ou sobremesa grátis? Publique a resposta mais votada."},
+    {"tag": "Série semanal", "title": "Um episódio por dia", "story": "Quadros recorrentes dão motivo para acompanhar o perfil.", "lesson": "Crie a série Segredos da Cozinha, com episódios de 15 segundos e títulos numerados."},
+    {"tag": "Reação", "title": "Primeira mordida", "story": "Reações reais podem demonstrar a experiência do produto.", "lesson": "Com consentimento, grave a reação de alguém provando uma novidade pela primeira vez."},
+    {"tag": "Desafio da equipe", "title": "Equipe escolhe o favorito", "story": "Mostrar preferências da equipe dá personalidade à marca.", "lesson": "Cada colaborador apresenta seu item favorito em um vídeo curto."},
+    {"tag": "Oferta contextual", "title": "Chuva combina com delivery", "story": "Mensagens ligadas ao contexto do dia podem ser mais relevantes.", "lesson": "Em um dia chuvoso, publique uma sugestão de jantar em casa sem inventar urgência."},
+    {"tag": "Mapa do bairro", "title": "Entrega na sua região", "story": "Conteúdo local ajuda a mostrar a área atendida.", "lesson": "Faça um story destacando bairros atendidos e peça aos seguidores que digam onde moram."},
+    {"tag": "Mito ou verdade", "title": "Curiosidade sobre ingredientes", "story": "Explicações simples despertam interesse e podem gerar compartilhamentos.", "lesson": "Desmistifique uma dúvida frequente sobre preparo ou conservação de um ingrediente."},
+    {"tag": "Pedido favorito", "title": "O campeão da semana", "story": "Destacar escolhas populares ajuda clientes indecisos.", "lesson": "Mostre o item mais pedido da semana usando seus números reais, sem inventar ranking."},
+    {"tag": "Personalização", "title": "Monte do seu jeito", "story": "Opções de personalização aumentam o envolvimento com o cardápio.", "lesson": "Mostre três combinações possíveis e convide o público a sugerir a quarta."},
+    {"tag": "Erro engraçado", "title": "Bastidor divertido", "story": "Humor leve e autêntico humaniza a comunicação.", "lesson": "Conte uma situação engraçada do expediente sem expor clientes ou funcionários."},
+    {"tag": "FAQ", "title": "Respondendo dúvidas frequentes", "story": "Respostas rápidas diminuem barreiras para a compra.", "lesson": "Grave um vídeo respondendo às três perguntas mais comuns sobre entrega e pedidos."},
+    {"tag": "Dia temático", "title": "Quarta do molho", "story": "Um tema fixo ajuda a criar expectativa na audiência.", "lesson": "Escolha um dia para apresentar molhos e peça sugestões de novas combinações."},
+    {"tag": "Microinfluenciador", "title": "Criador do bairro", "story": "Criadores locais podem alcançar um público próximo ao negócio.", "lesson": "Convide um criador local para experimentar um produto, deixando clara qualquer parceria paga."},
+    {"tag": "Quiz", "title": "Adivinhe o ingrediente", "story": "Jogos rápidos incentivam participação nos stories.", "lesson": "Mostre um close de um ingrediente e dê três opções para o público adivinhar."},
+    {"tag": "Conteúdo educativo", "title": "Como escolher seu combo", "story": "Orientações objetivas ajudam o cliente a decidir.", "lesson": "Monte um guia visual com sugestões de combo para uma, duas ou quatro pessoas."},
+    {"tag": "Feedback", "title": "Você pediu, a gente ouviu", "story": "Mostrar melhorias baseadas em opiniões valoriza a comunidade.", "lesson": "Apresente uma mudança real feita após sugestões de clientes."},
+    {"tag": "Datas especiais", "title": "Celebre o bairro", "story": "Eventos locais podem criar proximidade com a comunidade.", "lesson": "Faça um post sobre uma data relevante da cidade e conecte a mensagem à história do negócio."},
+    {"tag": "Comparativo", "title": "Dois estilos de pedido", "story": "Comparações simples geram debate sem atacar concorrentes.", "lesson": "Coloque lado a lado um combo clássico e um combo apimentado e peça votos."},
+    {"tag": "Unboxing", "title": "Abrindo o pedido", "story": "A apresentação da embalagem pode virar conteúdo compartilhável.", "lesson": "Filme a abertura de um pedido com boa iluminação e destaque o cuidado da montagem."},
+    {"tag": "Rotina", "title": "Um minuto no delivery", "story": "Rotinas aceleradas podem prender a atenção em vídeos curtos.", "lesson": "Faça um vídeo com cortes rápidos do pedido chegando até sair para entrega."},
+    {"tag": "Comunidade", "title": "Cliente da semana", "story": "Reconhecimento fortalece o vínculo com clientes frequentes.", "lesson": "Com autorização, apresente um cliente fiel e conte qual pedido ele mais gosta."},
+    {"tag": "Transparência", "title": "Por que fazemos assim", "story": "Explicar escolhas operacionais constrói confiança.", "lesson": "Mostre por que usa determinada embalagem ou método de preparo, sem revelar dados privados."},
+    {"tag": "Novidade", "title": "Teste de produto", "story": "Envolver o público na criação de novidades gera expectativa.", "lesson": "Mostre uma receita em teste e peça opiniões antes de decidir se entra no cardápio."},
+    {"tag": "Conteúdo salvável", "title": "Checklist do pedido perfeito", "story": "Materiais úteis são bons candidatos a salvamentos e compartilhamentos.", "lesson": "Publique um checklist curto de como escolher tamanho, bebida e acompanhamento."},
+    {"tag": "Story interativo", "title": "Escolha o próximo story", "story": "Deixar o público decidir a pauta cria participação.", "lesson": "Pergunte se querem ver a chapa, o estoque organizado ou a montagem dos pedidos."},
+    {"tag": "Curiosidade", "title": "Quanto tempo leva", "story": "Mostrar etapas de trabalho esclarece expectativas.", "lesson": "Grave um cronômetro de uma etapa real do preparo e explique que os tempos variam."},
+    {"tag": "Marca pessoal", "title": "Apresente o fundador", "story": "Conhecer a pessoa por trás da marca pode gerar confiança.", "lesson": "Grave uma apresentação de 30 segundos com a motivação para abrir o negócio."},
+    {"tag": "Campanha solidária", "title": "Ação com impacto local", "story": "Projetos comunitários autênticos aproximam a marca da região.", "lesson": "Divulgue uma ação real de apoio à comunidade com transparência sobre o destino dos recursos."},
+    {"tag": "Humor local", "title": "Frases que só a cidade entende", "story": "Referências locais podem aumentar identificação.", "lesson": "Crie um meme leve sobre um hábito conhecido na cidade sem ridicularizar grupos."},
+    {"tag": "Receita rápida", "title": "Molho em destaque", "story": "Receitas e dicas de cozinha podem ampliar o alcance do conteúdo.", "lesson": "Ensine uma versão caseira simples de um acompanhamento sem revelar receitas exclusivas."},
+    {"tag": "Cliente indeciso", "title": "Qual pedido combina com você", "story": "Conteúdos de escolha ajudam a explorar opções do cardápio.", "lesson": "Crie um carrossel: se gosta de picante, escolha A; se prefere clássico, escolha B."},
+    {"tag": "Retrospectiva", "title": "Os melhores momentos", "story": "Relembrar momentos reais reforça a identidade da empresa.", "lesson": "Monte um vídeo com cinco momentos marcantes do último mês e agradeça à comunidade."},
+    {"tag": "Colaboração", "title": "Troca de stories", "story": "Trocas de divulgação podem apresentar negócios a públicos semelhantes.", "lesson": "Combine com outro negócio local uma troca de recomendações genuínas."},
+    {"tag": "Desafio de comentários", "title": "Complete a frase", "story": "Frases incompletas são convites simples à participação.", "lesson": "Poste: um hambúrguer perfeito precisa ter ____; destaque respostas criativas."},
+    {"tag": "Edição rápida", "title": "Montagem em cinco cortes", "story": "Vídeos curtos podem comunicar um processo de forma envolvente.", "lesson": "Use cinco cortes: pão, proteína, queijo, molho e embalagem, com som original."},
+    {"tag": "Reconhecimento", "title": "Agradecimento à equipe", "story": "Valorizar o trabalho interno mostra os valores da marca.", "lesson": "Apresente alguém da equipe e agradeça uma contribuição concreta, com consentimento."},
+    {"tag": "Urgência real", "title": "Lote limitado de verdade", "story": "Quantidades limitadas podem incentivar decisão quando são reais.", "lesson": "Se houver produção limitada, informe a quantidade disponível e atualize quando acabar."},
+    {"tag": "Retenção", "title": "Volte para experimentar", "story": "Comunicar novidades a clientes existentes incentiva novas visitas.", "lesson": "Convide clientes antigos para conhecer um item recém-lançado, sem mensagens excessivas."},
+    {"tag": "Vitrine", "title": "Foto que abre o apetite", "story": "Uma boa apresentação visual facilita a avaliação do produto.", "lesson": "Fotografe o prato com luz natural e publique a imagem real sem exagerar na edição."},
+    {"tag": "Dúvida do público", "title": "Caixinha de perguntas", "story": "Perguntas revelam interesses e obstáculos do público.", "lesson": "Abra uma caixinha e responda em vídeo às perguntas mais úteis sobre o negócio."}
+  ];
+
+  let manualIndex = null;
+
+  function getDailyIndex(){
+    const now = new Date();
+    const seed = Math.floor(Date.UTC(now.getFullYear(),now.getMonth(),now.getDate())/86400000);
+    return seed % ideas.length;
+  }
+
+  function renderDailyViralIdea(index){
+    const idea = ideas[index];
+    const tag = document.getElementById("dailyViralTag");
+    const title = document.getElementById("dailyViralTitle");
+    const story = document.getElementById("dailyViralStory");
+    const lesson = document.getElementById("dailyViralLesson");
+    const date = document.getElementById("dailyViralDate");
+
+    if(tag) tag.textContent = idea.tag;
+    if(title) title.textContent = idea.title;
+    if(story) story.textContent = idea.story;
+    if(lesson) lesson.textContent = "Como usar hoje: " + idea.lesson;
+    if(date) date.textContent = "Ideia exibida para hoje. Amanhã o site troca automaticamente.";
+  }
+
+  window.nextDailyViralIdea = function(){
+    manualIndex = manualIndex === null ? getDailyIndex() : manualIndex;
+    manualIndex = (manualIndex + 1) % ideas.length;
+    renderDailyViralIdea(manualIndex);
+  };
+
+  renderDailyViralIdea(getDailyIndex());
+})();
+</script>
+
+
+<script id="real-action-modal-script">
+(function(){
+  const examples = {
+    "Panfletagem": ["Topo do funil", "Ação para aparecer na região e gerar primeiras impressões.", "Exemplo real: pizzarias, hamburguerias e lojas de bairro usam panfletagem com cupom para levar o cliente do papel para o WhatsApp.", "Como aplicar: panfleto com foto forte do lanche, QR Code do cardápio e oferta simples: 'apresente este cupom e ganhe batata pequena'."],
+    "Marketing de guerrilha": ["Topo do funil", "Ação criativa na rua para chamar atenção sem depender só de anúncio pago.", "Exemplo real: Burger King e Red Bull usam ações inesperadas e provocativas para virar conversa.", "Como aplicar: faça uma ação na calçada com placa engraçada, degustação rápida ou personagem da marca chamando atenção."],
+    "Eventos": ["Topo do funil", "Presença em lugares onde seu público já está reunido.", "Exemplo real: food trucks e marcas como Red Bull crescem muito aparecendo em eventos, faculdades, festas e esportes.", "Como aplicar: leve mini cupons, combos especiais e grave Reels do evento para reaproveitar no Instagram."],
+    "Boca a boca": ["Topo do funil", "Cliente satisfeito indicando outro cliente.", "Exemplo real: restaurantes locais crescem quando transformam clientes em divulgadores com experiência memorável.", "Como aplicar: entregue embalagem bonita, atendimento humano e um cupom: 'indique um amigo e os dois ganham desconto'."],
+    "Rádio": ["Topo do funil", "Canal local para alcançar bairros próximos.", "Exemplo real: mercados, restaurantes e farmácias de cidade usam rádio regional para fixar nome e promoção.", "Como aplicar: anuncie oferta curta em horários de fome: almoço, fim da tarde e noite."],
+    "Marketing verde": ["Topo do funil", "Posicionamento com comunidade e responsabilidade.", "Exemplo real: marcas como Natura e Patagonia usam causa e valores como parte da lembrança de marca.", "Como aplicar: mostre descarte correto, ações no bairro, redução de desperdício e parcerias locais."],
+    "Tráfego pago": ["Topo do funil", "Anúncios para alcançar pessoas perto da loja.", "Exemplo real: iFood, McDonald's e pequenos restaurantes usam anúncios geolocalizados para gerar demanda imediata.", "Como aplicar: impulsione vídeo curto de lanche para raio de poucos km, com botão para WhatsApp."],
+    "Redes sociais": ["Topo do funil", "Aparecer diariamente onde o cliente passa tempo.", "Exemplo real: Netflix e Burger King usam linguagem de rede social, meme e interação para parecerem próximos.", "Como aplicar: poste bastidor, humor, enquete, montagem do lanche e prova social todos os dias."],
+    "Criação de conteúdo": ["Topo do funil", "Conteúdo que atrai, diverte e desperta fome.", "Exemplo real: hamburguerias artesanais crescem com vídeos de chapa, queijo derretendo e reações de clientes.", "Como aplicar: grave 3 takes: chapa, montagem e mordida. Finalize com CTA para WhatsApp."],
+    "Marketing viral": ["Topo do funil", "Ideia fácil de compartilhar.", "Exemplo real: Oreo e Netflix usam posts simples e oportunos que entram na conversa do momento.", "Como aplicar: use trends, memes de fome, chuva, jogo e situações engraçadas do delivery."],
+    "Google e site": ["Topo do funil", "Ser encontrado quando o cliente procura comida.", "Exemplo real: restaurantes com Google Meu Negócio atualizado aparecem para quem busca 'hamburgueria perto de mim'.", "Como aplicar: atualize fotos, horário, cardápio, avaliações e link direto para pedido."],
+    "Co-marketing": ["Topo do funil", "Parceria com marcas e pessoas do mesmo público.", "Exemplo real: marcas fazem collabs com influenciadores locais, academias, barbearias e lojas.", "Como aplicar: crie combo com parceiro do bairro e publiquem juntos."],
+
+    "Stories → Foodporn → Prova social": ["Meio do funil", "Transforma curiosidade em desejo e confiança.", "Exemplo real: restaurantes usam stories de produto + repost de cliente para reduzir dúvida de compra.", "Como aplicar: poste lanche bonito, depois print de avaliação, depois link do WhatsApp."],
+    "Primeiras impressões": ["Meio do funil", "O cliente julga a marca antes de comprar.", "Exemplo real: Starbucks e McDonald's mantêm padrão visual forte para gerar confiança.", "Como aplicar: deixe Instagram, cardápio, fotos, link e WhatsApp bonitos e claros."],
+    "Real time": ["Meio do funil", "Responder rápido enquanto o cliente está com fome.", "Exemplo real: apps de delivery vencem porque reduzem demora e dúvida.", "Como aplicar: respostas prontas no WhatsApp, cardápio fixado e atendimento com tom humano."],
+    "Inbound marketing": ["Meio do funil", "Conteúdo útil que aproxima sem vender direto.", "Exemplo real: marcas de comida usam receitas, bastidores e curiosidades para manter relacionamento.", "Como aplicar: poste 'como escolhemos o blend', 'bastidor do molho' ou 'dica para batata crocante'."],
+    "Marketing sazonal/social": ["Meio do funil", "Aproveitar datas, clima e assunto do momento.", "Exemplo real: marcas como Oreo e Burger King fazem posts ligados a eventos e cultura pop.", "Como aplicar: chuva = combo conforto; jogo = combo torcida; sexta = combo pós-trampo."],
+    "Bônus e ofertas": ["Meio do funil", "Dar motivo para avançar para compra.", "Exemplo real: iFood e Domino's usam cupons e combos para quebrar indecisão.", "Como aplicar: oferta pequena mas clara: 'combo de hoje + batata por tempo limitado'."],
+    "Chamada para ação": ["Meio do funil", "Orientar o próximo passo do cliente.", "Exemplo real: e-commerces e apps usam botões diretos como 'comprar agora' e 'pedir novamente'.", "Como aplicar: todo post precisa terminar com 'chama no WhatsApp', 'clique no cardápio' ou 'peça agora'."],
+
+    "Experiência do cliente": ["Fundo do funil", "A compra precisa ser fácil e agradável.", "Exemplo real: Nubank virou referência por atendimento simples e humano.", "Como aplicar: confirme pedido, prazo, forma de pagamento e acompanhe se houve atraso."],
+    "Qualidade do produto": ["Fundo do funil", "Produto bom vende de novo e gera indicação.", "Exemplo real: redes como McDonald's crescem com padrão consistente.", "Como aplicar: padronize peso, montagem, embalagem, molho e tempo de entrega."],
+    "Cardápio irresistível": ["Fundo do funil", "O cliente decide mais rápido quando entende o produto.", "Exemplo real: iFood e restaurantes com fotos boas convertem mais porque reduzem dúvida.", "Como aplicar: foto real, descrição curta, preço claro e destaque para combos."],
+    "Preços estratégicos": ["Fundo do funil", "Combos e ancoragem aumentam ticket.", "Exemplo real: fast-foods usam combos para vender bebida, batata e adicionais.", "Como aplicar: tenha opção individual, combo médio e combo premium."],
+    "Pagamento facilitado": ["Fundo do funil", "Menos barreira para finalizar pedido.", "Exemplo real: apps simplificam pagamento salvo, Pix e cartão.", "Como aplicar: aceite Pix, cartão, dinheiro e envie instruções claras."],
+    "Embalagem incrível": ["Fundo do funil", "A embalagem vira parte da experiência.", "Exemplo real: cafeterias e marcas premium usam embalagem como memória da marca.", "Como aplicar: etiqueta, frase engraçada, guardanapo bonito e brinde simples."],
+    "Tempo de entrega": ["Fundo do funil", "Prazo influencia recompra.", "Exemplo real: Domino's construiu posicionamento histórico em rapidez de entrega.", "Como aplicar: prometa prazo realista e avise antes se atrasar."],
+    "Feedback e pesquisa": ["Fundo do funil", "Aprender com o cliente melhora conversão.", "Exemplo real: grandes redes monitoram satisfação e avaliações constantemente.", "Como aplicar: mande mensagem curta após pedido: 'de 0 a 10, como foi?'. "],
+    "Marketing de performance": ["Fundo do funil", "Medir o que gera venda.", "Exemplo real: e-commerces acompanham clique, pedido e retorno de anúncio.", "Como aplicar: anote qual vídeo gerou WhatsApp, pedido e faturamento."],
+    "Remarketing": ["Fundo do funil", "Trazer de volta quem quase comprou.", "Exemplo real: lojas e apps mostram anúncios para quem viu produto e não comprou.", "Como aplicar: mande mensagem para quem pediu cardápio e sumiu: 'quer que eu te mande o combo de hoje?'."],
+
+    "Programa de pontos": ["Fidelização", "Recompensa para voltar mais vezes.", "Exemplo real: Starbucks Rewards usa pontos para aumentar recorrência.", "Como aplicar: a cada X pedidos, cliente ganha batata, sobremesa ou desconto."],
+    "Sorteios": ["Fidelização", "Motivo para acompanhar a marca.", "Exemplo real: marcas locais usam sorteios com marcação de amigos para alcance e recompra.", "Como aplicar: sorteio entre clientes da semana, não só seguidores aleatórios."],
+    "Grupo de ofertas": ["Fidelização", "Canal direto com clientes que já compraram.", "Exemplo real: lojas e restaurantes usam lista VIP para vender rápido em dias fracos.", "Como aplicar: grupo WhatsApp com ofertas relâmpago e benefício exclusivo."],
+    "Confiança e respeito": ["Fidelização", "A base para o cliente voltar.", "Exemplo real: marcas fortes mantêm transparência quando erram.", "Como aplicar: se atrasar, avise, peça desculpa e compense quando necessário."],
+    "Game marketing": ["Fidelização", "Experiências divertidas aumentam engajamento.", "Exemplo real: McDonald's Monopoly virou referência de jogo promocional.", "Como aplicar: roleta, desafio de print, cupom escondido e ranking de clientes."],
+    "Feedback": ["Fidelização", "Cliente ouvido compra mais.", "Exemplo real: empresas que escutam reviews ajustam produto e atendimento.", "Como aplicar: peça opinião e mostre melhoria feita com base no feedback."],
+  };
+
+  function normalizeText(text){
+    return text.replace(/\s+/g," ").trim();
+  }
+
+  window.openRealActionModal = function(title){
+    const data = examples[title] || ["Exemplo prático", "Esta ação faz parte do funil de vendas.", "Exemplo real: empresas fortes usam essa etapa para aproximar o cliente e aumentar vendas.", "Como aplicar: transforme essa ideia em uma ação simples, medível e repetida toda semana."];
+    document.getElementById("realActionStage").textContent = data[0];
+    document.getElementById("realActionTitle").textContent = title;
+    document.getElementById("realActionText").textContent = data[1];
+    document.getElementById("realActionExample").textContent = data[2];
+    document.getElementById("realActionTip").textContent = data[3];
+    document.getElementById("realActionModal").classList.add("active");
+  };
+
+  window.hideRealActionModal = function(){
+    document.getElementById("realActionModal").classList.remove("active");
+  };
+
+  window.closeRealActionModal = function(event){
+    if(event.target && event.target.id === "realActionModal"){
+      hideRealActionModal();
+    }
+  };
+
+  document.addEventListener("DOMContentLoaded", function(){
+    document.querySelectorAll(".stage .item").forEach(function(item){
+      item.addEventListener("click", function(){
+        const clone = item.cloneNode(true);
+        clone.querySelectorAll("small,.ani-icon,.animated-icon,.arrow").forEach(function(el){ el.remove(); });
+        const title = normalizeText(clone.textContent);
+        openRealActionModal(title);
+      });
+    });
+  });
+})();
+</script>
+
+
+<script id="company-profile-script">
+(function(){
+ const KEY_NAME='funil_company_name', KEY_PHOTO='funil_company_photo';
+ const fallbackName='Seu perfil';
+ function els(){return {side:document.getElementById('companySidebar'),overlay:document.getElementById('companyOverlay'),panel:document.getElementById('companyProfilePanel'),input:document.getElementById('companyNameInput'),preview:document.getElementById('companyAvatarPreview'),headerName:document.getElementById('companyHeaderName'),headerLogo:document.getElementById('companyHeaderLogo'),welcome:document.getElementById('companyWelcomeName'),saved:document.getElementById('companySaved')}}
+ function apply(){const e=els(),name=localStorage.getItem(KEY_NAME)||fallbackName,photo=localStorage.getItem(KEY_PHOTO)||"";e.headerName.textContent=name;if(e.welcome)e.welcome.textContent=name;e.input.value=name;if(photo){e.preview.src=photo;e.headerLogo.src=photo;e.headerLogo.style.display=""}else{e.preview.removeAttribute("src");e.headerLogo.removeAttribute("src");e.headerLogo.style.display="none"}document.title=name+' - Funil de Vendas'}
+ window.funilRefreshIdentity=apply;window.openCompanyMenu=function(){const e=els();e.side.classList.add('active');e.overlay.classList.add('active')};
+ window.closeCompanyMenu=function(){const e=els();e.side.classList.remove('active');e.overlay.classList.remove('active')};
+ window.toggleCompanyProfile=function(){els().panel.classList.toggle('active')};
+ window.saveCompanyProfile=function(){const e=els(),name=e.input.value.trim()||fallbackName;localStorage.setItem(KEY_NAME,name);e.headerName.textContent=name;if(e.welcome)e.welcome.textContent=name;document.title=name+' - Funil de Vendas';e.saved.style.display='block';setTimeout(()=>e.saved.style.display='none',1800)};
+ document.addEventListener('DOMContentLoaded',function(){apply();document.getElementById('companyPhotoInput').addEventListener('change',function(ev){const file=ev.target.files&&ev.target.files[0];if(!file)return;if(!file.type.startsWith('image/'))return;const reader=new FileReader();reader.onload=function(){const data=reader.result;localStorage.setItem(KEY_PHOTO,data);const e=els();e.preview.src=data;e.headerLogo.src=data};reader.readAsDataURL(file)});});
+})();
+</script>
+
+<script id="menu-scroll-v6">
+(function(){
+  var navigating = false;
+
+  function closeMenuOnly(){
+    var side = document.getElementById("companySidebar");
+    var overlay = document.getElementById("companyOverlay");
+    if(side) side.classList.remove("active");
+    if(overlay) overlay.classList.remove("active");
+  }
+
+  function safeScrollTo(id){
+    if(navigating) return;
+    var target = document.getElementById(id);
+    if(!target) return;
+
+    navigating = true;
+    closeMenuOnly();
+
+    // Wait for the drawer transition to finish before moving the document.
+    window.setTimeout(function(){
+      var nav = document.querySelector(".nav");
+      var navHeight = nav ? nav.getBoundingClientRect().height : 72;
+      var y = target.getBoundingClientRect().top + window.pageYOffset - navHeight - 14;
+      if(y < 0) y = 0;
+
+      try{
+        window.scrollTo({top:y, behavior:"smooth"});
+      }catch(err){
+        window.scrollTo(0,y);
+      }
+
+      window.setTimeout(function(){ navigating = false; }, 650);
+    }, 340);
+  }
+
+  window.goToViralIdea = function(){ safeScrollTo("ideia-viral-do-dia"); };
+  window.goToDailyChallenge = function(){ safeScrollTo("desafio-do-dia"); };
+})();
+</script>
+
+
+
+
+
+<script id="daily-challenge-agenda-v7">
+(function(){
+  const challenges=[
+    ["Topo do funil: vídeo foodporn","Grave um vídeo curto mostrando chapa, montagem e produto pronto.","Meta: publicar hoje nos Stories ou Reels."],
+    ["Topo do funil: marketing viral","Use uma trend, meme, clima, jogo ou assunto local para criar um post compartilhável.","Meta: publicar 1 conteúdo contextual hoje."],
+    ["Topo do funil: boca a boca","Crie um motivo simples para um cliente indicar outro.","Meta: fazer 3 convites de indicação."],
+    ["Topo do funil: co-marketing","Procure uma empresa, influenciador ou comércio com público parecido.","Meta: iniciar 1 conversa de parceria."],
+    ["Topo do funil: Google e site","Revise foto, horário, cardápio e caminho até o pedido.","Meta: corrigir pelo menos 1 ponto que esteja desatualizado."],
+    ["Meio do funil: prova social","Escolha uma avaliação ou mensagem real de cliente e transforme em Story.","Meta: publicar com foto do produto."],
+    ["Meio do funil: real time","Melhore uma resposta pronta do WhatsApp para atender quem está com fome mais rápido.","Meta: reduzir uma etapa do atendimento."],
+    ["Meio do funil: chamada para ação","Troque uma chamada genérica por Peça agora, Chama no WhatsApp ou Veja o cardápio.","Meta: usar o CTA em 1 publicação."],
+    ["Meio do funil: oferta","Monte uma oferta simples e com validade real.","Meta: divulgar nos Stories e WhatsApp."],
+    ["Fundo do funil: cardápio irresistível","Escolha um produto e melhore foto, descrição ou destaque do preço.","Meta: deixar 1 item mais fácil de comprar."],
+    ["Fundo do funil: experiência","Revise confirmação, prazo e forma de pagamento do pedido.","Meta: eliminar 1 atrito da compra."],
+    ["Fundo do funil: embalagem","Adicione um detalhe memorável na entrega: frase, etiqueta ou apresentação.","Meta: testar em pelo menos 1 pedido."],
+    ["Fundo do funil: feedback","Pergunte a clientes recentes como foi a experiência.","Meta: conseguir pelo menos 3 respostas."],
+    ["Fundo do funil: remarketing","Fale com clientes que pediram cardápio ou demonstraram interesse e não compraram.","Meta: reativar 5 conversas."],
+    ["Fidelização: programa de pontos","Defina uma recompensa simples para estimular recompra.","Meta: criar uma regra clara de recompensa."],
+    ["Fidelização: grupo de ofertas","Prepare uma vantagem exclusiva para clientes recorrentes.","Meta: enviar para sua lista ou grupo VIP."],
+    ["Fidelização: confiança","Escolha um ponto do atendimento que pode ser mais transparente e humano.","Meta: aplicar a melhoria hoje."],
+    ["Fidelização: game marketing","Crie uma ação divertida: roleta, desafio de print, cupom escondido ou ranking.","Meta: definir prêmio + regra simples."],
+    ["Marketing de performance","Veja qual conteúdo ou anúncio realmente trouxe conversa ou pedido.","Meta: anotar 1 ação para repetir e 1 para parar."],
+    ["Marketing sazonal","Use a data, clima ou acontecimento do dia como motivo para comunicar uma oferta.","Meta: criar 1 campanha rápida para hoje."]
+  ];
+
+  function pad(n){return String(n).padStart(2,"0")}
+  function dateKey(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
+  function seedFor(d){return Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/86400000)}
+  function challengeFor(d){return challenges[seedFor(d)%challenges.length]}
+  function safeGet(k, fallback){try{return JSON.parse(localStorage.getItem(k)) ?? fallback}catch(e){return fallback}}
+  function safeSet(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+
+  const now=new Date(), key=dateKey(now), c=challengeFor(now);
+  const day=document.getElementById("challengeDay"), month=document.getElementById("challengeMonth"), weekday=document.getElementById("challengeWeekday");
+  if(day) day.textContent=pad(now.getDate());
+  if(month) month.textContent=now.toLocaleDateString("pt-BR",{month:"short"}).replace(".","");
+  if(weekday) weekday.textContent=now.toLocaleDateString("pt-BR",{weekday:"long"});
+
+  const title=document.getElementById("dailyChallengeTitle"), txt=document.getElementById("dailyChallengeText"), goal=document.getElementById("dailyChallengeGoal");
+  if(title) title.textContent=c[0]; if(txt) txt.textContent=c[1]; if(goal) goal.textContent=c[2];
+
+  let completed=safeGet("funilDailyChallengesCompleted",[]);
+  if(!Array.isArray(completed)) completed=[];
+
+  const btn=document.getElementById("challengeCompleteBtn"), btnText=document.getElementById("challengeCompleteText"), trophy=document.getElementById("challengeTrophy");
+  const count=document.getElementById("challengeTrophyCount"), streak=document.getElementById("challengeStreak");
+
+  function render(){
+    const done=completed.includes(key);
+    if(btn){btn.classList.toggle("done",done);btn.disabled=done}
+    if(btnText) btnText.textContent=done?"Objetivo concluído hoje":"Objetivo concluído";
+    if(trophy) trophy.classList.toggle("show",done);
+    if(count) count.textContent=completed.length;
+    if(streak) streak.textContent=completed.length;
+  }
+
+  if(btn) btn.addEventListener("click",function(){
+    if(completed.includes(key)) return;
+    completed.push(key);
+    completed=[...new Set(completed)].sort();
+    safeSet("funilDailyChallengesCompleted",completed);
+    render();
+  });
+
+  render();
+})();
+</script>
+
+
+<script id="full-profile-script-v11">
+(function(){
+ const $=id=>document.getElementById(id);
+ const page=$("fullProfilePage"),nameInput=$("fullCompanyName"),photo=$("fullProfilePhoto"),fallback=$("fullProfileFallback"),photoInput=$("fullProfilePhotoInput");
+ function get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}}
+ function set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+ function currentName(){try{return localStorage.getItem("funil_company_name")||"Seu perfil"}catch(e){return "Seu perfil"}}
+ function currentPhoto(){try{return localStorage.getItem("funil_company_photo")||""}catch(e){return ""}}
+ function showPhoto(src){if(src){photo.src=src;photo.style.display="block";fallback.style.display="none"}else{photo.removeAttribute("src");photo.style.display="none";fallback.style.display="grid"}}
+ function closeDrawer(){if(typeof window.closeCompanyMenu==="function"){window.closeCompanyMenu();return;}["companySidebar","companyOverlay"].forEach(id=>{const e=$(id);if(e)e.classList.remove("active")})}
+ function syncHeader(name,src){document.querySelectorAll(".header-brand-name,#companyWelcomeName,#companyHeaderName").forEach(e=>e.textContent=name);document.querySelectorAll(".header-brand-logo,#companyHeaderLogo").forEach(e=>{if(src){e.src=src;e.style.display=""}else{e.removeAttribute("src");e.style.display="none"}})}
+ function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+ function goals(){let a=get("companyPendingGoals",[]);return Array.isArray(a)?a:[]}
+ function medals(){let a=get("companyGoalAchievements",[]);if(!Array.isArray(a))a=[];let changed=false;a=a.map(m=>{if(!m.id){changed=true;return Object.assign({},m,{id:uid()})}return m});if(changed)set("companyGoalAchievements",a);return a}
+ function renderGoals(){
+   const a=goals(),list=$("pendingGoalsList");list.innerHTML="";$("pendingGoalCount").textContent=a.length;$("pendingGoalsEmpty").style.display=a.length?"none":"block";
+   a.forEach(g=>{const row=document.createElement("div");row.className="pending-goal-item";
+     const copy=document.createElement("div"),strong=document.createElement("strong"),small=document.createElement("small");strong.textContent=g.goal;small.textContent="Adicionada em "+g.date;copy.append(strong,small);
+     const acts=document.createElement("div");acts.className="pending-goal-actions";
+     const done=document.createElement("button");done.type="button";done.className="pending-goal-done";done.textContent="🏆 Conquistei";
+     done.addEventListener("click",()=>completeGoal(g.id));
+     const del=document.createElement("button");del.type="button";del.className="pending-goal-delete";del.setAttribute("aria-label","Excluir meta");del.textContent="×";del.addEventListener("click",()=>deletePending(g.id));
+     acts.append(done,del);row.append(copy,acts);list.appendChild(row);
+   });
+ }
+ function renderMedals(){
+   const a=medals(),grid=$("achievementGrid"),empty=$("achievementEmpty");grid.innerHTML="";empty.style.display=a.length?"none":"block";$("achievementCount").textContent=a.length;$("profileMedalStat").textContent=a.length;
+   a.slice().reverse().forEach((m,i)=>{const originalIndex=a.length-1-i;const card=document.createElement("div");card.className="achievement-item";
+     const medal=document.createElement("div");medal.className="achievement-medal";medal.innerHTML='<span class="animated-medal-icon" aria-hidden="true"><i class="medal-ribbon left"></i><i class="medal-ribbon right"></i><b><em>★</em></b></span>';
+     const strong=document.createElement("strong");strong.textContent=m.goal;const small=document.createElement("small");small.textContent=m.date;
+     const del=document.createElement("button");del.type="button";del.className="delete-medal-btn";del.setAttribute("aria-label","Excluir esta medalha");del.innerHTML='<span class="trash-ani" aria-hidden="true"><i></i></span><span>Excluir medalha</span>';del.addEventListener("click",()=>openDeleteMedalModal(originalIndex,m.goal));
+     card.append(medal,strong,small,del);grid.appendChild(card);
+   });
+ }
+ function refreshStats(){let daily=get("funilDailyChallengesCompleted",[]);if(!Array.isArray(daily))daily=[];$("profileTrophyStat").textContent=daily.length;renderGoals();renderMedals()}
+ function completeGoal(id){let p=goals(),g=p.find(x=>x.id===id);if(!g)return;p=p.filter(x=>x.id!==id);let a=medals();a.push({id:uid(),goal:g.goal,date:new Date().toLocaleDateString("pt-BR")});set("companyPendingGoals",p);set("companyGoalAchievements",a);refreshStats()}
+ function deletePending(id){if(!confirm("Excluir esta meta em andamento?"))return;set("companyPendingGoals",goals().filter(x=>x.id!==id));renderGoals()}
+ let medalPendingDelete=null;function openDeleteMedalModal(index,goal){medalPendingDelete=index;$("deleteMedalName").textContent=goal;$("deleteMedalModal").classList.add("active")}function closeDeleteMedalModal(){medalPendingDelete=null;$("deleteMedalModal").classList.remove("active")}function confirmDeleteMedal(){if(medalPendingDelete===null)return;let a=medals();if(medalPendingDelete<0||medalPendingDelete>=a.length){closeDeleteMedalModal();return}a.splice(medalPendingDelete,1);set("companyGoalAchievements",a);closeDeleteMedalModal();renderMedals()}
+ window.openFullProfilePage=function(){closeDrawer();$("cancelDeleteMedalBtn").addEventListener("click",closeDeleteMedalModal);$("confirmDeleteMedalBtn").addEventListener("click",confirmDeleteMedal);$("deleteMedalModal").addEventListener("click",function(e){if(e.target===this)closeDeleteMedalModal()});nameInput.value=currentName();showPhoto(currentPhoto());refreshStats();document.body.classList.add("profile-page-open");page.classList.add("active");page.setAttribute("aria-hidden","false");window.scrollTo(0,0)}
+ function closeProfile(){document.body.classList.remove("profile-page-open");page.classList.remove("active");page.setAttribute("aria-hidden","true");window.scrollTo(0,0)}
+ $("profileBackBtn").addEventListener("click",closeProfile);
+ $("chooseProfilePhotoBtn").addEventListener("click",()=>{$("galleryConsentModal").classList.add("active");$("galleryConsentModal").setAttribute("aria-hidden","false")});
+ $("denyGalleryBtn").addEventListener("click",()=>{$("galleryConsentModal").classList.remove("active");$("galleryConsentModal").setAttribute("aria-hidden","true")});
+ $("allowGalleryBtn").addEventListener("click",()=>{$("galleryConsentModal").classList.remove("active");$("galleryConsentModal").setAttribute("aria-hidden","true");photoInput.click()});
+ photoInput.addEventListener("change",function(){const f=this.files&&this.files[0];if(!f)return;if(!f.type.startsWith("image/"))return;if(f.size>5*1024*1024){$("profileSaveStatus").textContent="Escolha uma imagem de até 5 MB.";return}const r=new FileReader();r.onload=()=>{showPhoto(r.result);photo.dataset.pending=r.result};r.readAsDataURL(f)});
+ $("saveFullProfileBtn").addEventListener("click",function(){const name=nameInput.value.trim().slice(0,60)||"Minha empresa",src=photo.dataset.pending||currentPhoto();try{localStorage.setItem("funil_company_name",name);localStorage.setItem("funil_company_photo",src)}catch(e){};syncHeader(name,src);$("profileSaveStatus").textContent="Perfil salvo com sucesso."});
+ $("addCompanyGoalBtn").addEventListener("click",function(){const f=$("companyGoalInput"),v=f.value.trim();if(!v){f.focus();return}let a=goals();a.push({id:uid(),goal:v,date:new Date().toLocaleDateString("pt-BR")});set("companyPendingGoals",a);f.value="";renderGoals()});
+ const since=get("companyProfileSince",null)||new Date().toLocaleDateString("pt-BR");set("companyProfileSince",since);$("profileMemberSince").textContent=since;
+ nameInput.value=currentName();showPhoto(currentPhoto());refreshStats();
+})();
+</script>
+
+<div class="delete-medal-modal" id="deleteMedalModal"><div class="delete-medal-box"><div class="delete-modal-icon"><span class="trash-ani big"><i></i></span></div><span class="delete-modal-kicker">EXCLUIR CONQUISTA</span><h3>Apagar esta medalha?</h3><p>Você está prestes a remover somente a medalha:</p><strong class="delete-medal-name" id="deleteMedalName"></strong><small>As outras medalhas e metas não serão alteradas.</small><div class="delete-medal-actions"><button type="button" class="cancel-delete-medal" id="cancelDeleteMedalBtn">Cancelar</button><button type="button" class="confirm-delete-medal" id="confirmDeleteMedalBtn">Excluir esta medalha</button></div></div></div>
+<script id="settings-script-v15">
+(function(){
+ const $=id=>document.getElementById(id),root=document.documentElement;
+ const defaults={theme:"dark",font:"normal",animations:true,confirmDelete:true,startPage:"home"};
+ function load(){try{return Object.assign({},defaults,JSON.parse(localStorage.getItem("funil_settings")||"{}"))}catch(e){return {...defaults}}}
+ function save(s){try{localStorage.setItem("funil_settings",JSON.stringify(s))}catch(e){} apply(s);flash()}
+ function apply(s){
+  root.classList.remove("light-theme","app-font-small","app-font-large","reduce-motion");
+  let theme=s.theme;if(theme==="system"&&window.matchMedia)theme=window.matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";
+  if(theme==="light")root.classList.add("light-theme");if(s.font==="small")root.classList.add("app-font-small");if(s.font==="large")root.classList.add("app-font-large");if(!s.animations)root.classList.add("reduce-motion");
+  document.querySelectorAll("[data-theme-choice]").forEach(b=>b.classList.toggle("active",b.dataset.themeChoice===s.theme));
+  document.querySelectorAll("[data-font]").forEach(b=>b.classList.toggle("active",b.dataset.font===s.font));
+  $("animationsSetting").checked=!!s.animations;$("confirmDeleteSetting").checked=!!s.confirmDelete;$("startPageSetting").value=s.startPage;
+ }
+ let flashTimer;function flash(){const e=$("settingsSaved");e.classList.add("show");clearTimeout(flashTimer);flashTimer=setTimeout(()=>e.classList.remove("show"),1200)}
+ window.openSettingsPage=function(){if(typeof closeCompanyMenu==="function")closeCompanyMenu();document.body.classList.remove("profile-page-open");$("fullProfilePage")?.classList.remove("active");document.body.classList.add("settings-open");$("settingsPage").classList.add("active");$("settingsPage").setAttribute("aria-hidden","false");apply(load());window.scrollTo(0,0)}
+ function close(){document.body.classList.remove("settings-open");$("settingsPage").classList.remove("active");$("settingsPage").setAttribute("aria-hidden","true");window.scrollTo(0,0)}
+ $("settingsBackBtn").addEventListener("click",close);
+ document.querySelectorAll("[data-theme-choice]").forEach(b=>b.addEventListener("click",()=>{let s=load();s.theme=b.dataset.themeChoice;save(s)}));
+ document.querySelectorAll("[data-font]").forEach(b=>b.addEventListener("click",()=>{let s=load();s.font=b.dataset.font;save(s)}));
+ $("animationsSetting").addEventListener("change",function(){let s=load();s.animations=this.checked;save(s)});
+ $("confirmDeleteSetting").addEventListener("change",function(){let s=load();s.confirmDelete=this.checked;save(s)});
+ $("startPageSetting").addEventListener("change",function(){let s=load();s.startPage=this.value;save(s)});
+ $("resetSettingsBtn").addEventListener("click",()=>$("resetSettingsModal").classList.add("active"));
+ $("cancelResetSettings").addEventListener("click",()=>$("resetSettingsModal").classList.remove("active"));
+ $("confirmResetSettings").addEventListener("click",()=>{try{localStorage.removeItem("funil_settings")}catch(e){};$("resetSettingsModal").classList.remove("active");apply(defaults);flash()});
+ apply(load());
+})();
+</script>
+
+
+<script id="support-script-v16">
+(function(){
+ const page=document.getElementById("supportPage");
+ window.openSupportPage=function(){
+   if(typeof closeCompanyMenu==="function")closeCompanyMenu();
+   document.body.classList.remove("profile-page-open","settings-open");
+   document.getElementById("fullProfilePage")?.classList.remove("active");
+   document.getElementById("settingsPage")?.classList.remove("active");
+   document.body.classList.add("support-open");page.classList.add("active");page.setAttribute("aria-hidden","false");window.scrollTo(0,0);
+ };
+ document.getElementById("supportBackBtn").addEventListener("click",function(){document.body.classList.remove("support-open");page.classList.remove("active");page.setAttribute("aria-hidden","true");window.scrollTo(0,0)});
+})();
+</script>
+
+
+
+<div class="install-app-modal" id="installAppModal" aria-hidden="true">
+ <div class="install-app-box">
+  <button class="install-close" id="installCloseBtn" type="button" aria-label="Fechar">×</button>
+  <div class="install-app-icon"><span></span><i></i></div>
+  <span class="install-kicker">FUNIL DE VENDAS</span>
+  <h2>Transforme este site em um app</h2>
+  <p id="installAppDescription">Instale no seu celular para abrir mais rápido e usar como um aplicativo.</p>
+  <div class="ios-install-steps" id="iosInstallSteps">
+    <b>No iPhone/iPad:</b>
+    <span>1. Toque em <strong>Compartilhar</strong>.</span>
+    <span>2. Escolha <strong>Adicionar à Tela de Início</strong>.</span>
+    <span>3. Toque em <strong>Adicionar</strong>.</span>
+  </div>
+  <button class="install-main-btn" id="installMainBtn" type="button">Instalar aplicativo</button>
+  <button class="install-later-btn" id="installLaterBtn" type="button">Agora não</button>
+  <small>Você pode continuar usando pelo navegador normalmente.</small>
+ </div>
+</div>
+
+
+<script id="cloud-pwa-script-v17">
+(function(){
+ let deferredPrompt=null;
+ // PWA install experience
+ const modal=document.getElementById("installAppModal"),main=document.getElementById("installMainBtn"),iosSteps=document.getElementById("iosInstallSteps");
+ const standalone=window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true;
+ const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+ function closeInstall(){modal.classList.remove("active");modal.setAttribute("aria-hidden","true");localStorage.setItem("funil_install_prompt_seen","1")}
+ function showInstall(){if(standalone||localStorage.getItem("funil_install_prompt_seen"))return;modal.classList.add("active");modal.setAttribute("aria-hidden","false");if(isIOS){iosSteps.classList.add("show");main.textContent="Entendi";document.getElementById("installAppDescription").textContent="Adicione o Funil de Vendas à Tela de Início para usar como aplicativo."}}
+ window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;setTimeout(showInstall,650)});
+ main.addEventListener("click",async()=>{if(isIOS){closeInstall();return}if(deferredPrompt){deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;closeInstall()}else{document.getElementById("installAppDescription").textContent="Abra este site no Chrome e use a opção “Instalar app” ou “Adicionar à tela inicial” no menu do navegador.";main.textContent="Entendi";main.onclick=closeInstall}});
+ document.getElementById("installCloseBtn").addEventListener("click",closeInstall);document.getElementById("installLaterBtn").addEventListener("click",closeInstall);
+ window.addEventListener("appinstalled",closeInstall);
+ if(isIOS)setTimeout(showInstall,900);
+
+ if("serviceWorker" in navigator&&location.protocol!=="file:")window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+})();
+</script>
+<style id="funil-logout-style-v28">
+.account-logout-card{margin-top:18px}.funil-logout-btn{background:#a92f38;color:white;border:1px solid #d94a54;border-radius:13px;padding:15px 18px;font-size:16px;font-weight:750;width:100%;cursor:pointer}.funil-logout-btn:hover{background:#c23742}
+.funil-logout-overlay[hidden]{display:none!important}.funil-logout-overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:999999;display:flex;align-items:center;justify-content:center;padding:22px}.funil-logout-dialog{background:#1d2029;border:1px solid #555965;border-radius:24px;max-width:410px;width:100%;padding:28px;color:#fff;box-shadow:0 22px 80px #0009}.funil-logout-symbol{font-size:32px;color:#ff777d}.funil-logout-dialog h2{margin:10px 0;font-size:25px}.funil-logout-dialog p{color:#d2d4dc;line-height:1.55}.funil-logout-actions{display:flex;gap:12px;margin-top:24px}.funil-logout-actions button{flex:1;border:1px solid #686c76;border-radius:12px;padding:13px 8px;background:#343844;color:white;font-weight:700;cursor:pointer}.funil-logout-actions #funilLogoutConfirm{background:#b6313b;border-color:#b6313b}
+</style>
+<script id="username-auth-onboarding-v19">
+(async function(){
+ const API="https://gradwrrszjwcapymqlwi.supabase.co/functions/v1/funil-account";const $=id=>document.getElementById(id),gate=$("authGate"),onGate=$("onboardingGate"),msg=$("authMessage");let step=0,answers={},photoData="";
+ async function api(action,data={}){const token=localStorage.getItem("funil_session_token");const r=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action,token,...data})});const j=await r.json().catch(()=>({error:"Falha de conexão."}));if(!r.ok)throw Error(j.error||"Erro.");return j}
+ function panel(id){["authLoginPanel","authCreatePanel","recoveryCodePanel","recoverPanel"].forEach(x=>$(x).hidden=x!==id);msg.textContent=""}function show(){gate.classList.add("active")}function hide(){gate.classList.remove("active")}function message(t,ok=false){msg.textContent=t;msg.style.color=ok?"#69e9a1":"#ff8383"}
+ $("showCreateBtn").onclick=()=>panel("authCreatePanel");$("backLoginBtn").onclick=()=>panel("authLoginPanel");$("forgotBtn").onclick=()=>panel("recoverPanel");$("recoverBackBtn").onclick=()=>panel("authLoginPanel");$("togglePassword").onclick=()=>{let i=$("authPassword");i.type=i.type==="password"?"text":"password";$("togglePassword").classList.toggle("eye-open",i.type==="text");$("togglePassword").setAttribute("aria-label",i.type==="text"?"Ocultar senha":"Mostrar senha")};
+ document.querySelectorAll(".pw-eye").forEach(btn=>btn.onclick=()=>{let i=$(btn.dataset.target);i.type=i.type==="password"?"text":"password";btn.classList.toggle("eye-open",i.type==="text");btn.setAttribute("aria-label",i.type==="text"?"Ocultar senha":"Mostrar senha")});
+ function clearAppProfileData(){const keepInstall=localStorage.getItem("funil_install_prompt_seen");const keys=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&(k.startsWith("funil_")||k.startsWith("company")))keys.push(k)}keys.forEach(k=>localStorage.removeItem(k));if(keepInstall)localStorage.setItem("funil_install_prompt_seen",keepInstall)}
+ $("createBtn").onclick=async()=>{try{message("Criando...",true);let j=await api("signup",{username:$("createUsername").value.trim(),password:$("createPassword").value});clearAppProfileData();localStorage.setItem("funil_session_token",j.token);localStorage.setItem("funil_username",j.username);$("newRecoveryCode").textContent=j.recovery_code;panel("recoveryCodePanel")}catch(e){message(e.message)}};
+ $("savedCodeBtn").onclick=async()=>{hide();startOnboarding()};
+ $("loginBtn").onclick=async()=>{try{message("Entrando...",true);let j=await api("login",{username:$("authUsername").value.trim(),password:$("authPassword").value});clearAppProfileData();localStorage.setItem("funil_session_token",j.token);localStorage.setItem("funil_username",j.username);hide();await loadAccount()}catch(e){message(e.message)}};
+ $("recoverBtn").onclick=async()=>{try{await api("recover",{username:$("recoverUsername").value.trim(),recovery_code:$("recoverCode").value.trim().toUpperCase(),new_password:$("recoverPassword").value});message("Senha alterada. Entre com a nova senha.",true);setTimeout(()=>panel("authLoginPanel"),900)}catch(e){message(e.message)}};
+ async function loadAccount(){
+  try{
+    const j=await api("get");
+    if(j.state)Object.entries(j.state).forEach(([k,v])=>{if(k!=="funil_session_token"&&k!=="funil_username")localStorage.setItem(k,v)});
+    if(!j.profile?.onboarding_completed)startOnboarding();
+    else {applyProfile(j.profile);hide()}
+  }catch(e){
+    // A temporary network/server error is NOT a logout.
+    const cached=localStorage.getItem("funil_personalization");
+    if(cached){try{const profile=JSON.parse(cached);if(profile.onboarding_completed){applyProfile(profile);hide();return}}catch(_){}}
+    if(!navigator.onLine || /fetch|network|conexão|failed/i.test(String(e.message))){
+      hide();return;
+    }
+    // Keep the token even on unexpected failures. The user may retry after connectivity returns.
+    hide();
+  }
+}
+ function startOnboarding(){["funil_company_name","funil_company_photo","funil_personalization"].forEach(k=>localStorage.removeItem(k));if(typeof window.funilRefreshIdentity==="function")window.funilRefreshIdentity();step=0;answers={};photoData="";$("onName").value="";$("onPhotoInput").value="";$("onPhotoPreview").removeAttribute("src");$("onPhotoPreview").style.display="none";$("onPhotoPlaceholder").style.display="";document.querySelectorAll(".choice-grid button").forEach(x=>x.classList.remove("selected"));showStep();onGate.classList.add("active")}function showStep(){document.querySelectorAll(".on-step").forEach(e=>e.classList.toggle("active",+e.dataset.step===step));$("onboardingBar").style.width=((step+1)/7*100)+"%";$("onBack").style.visibility=step===0?"hidden":"visible";$("onNext").textContent=step===6?"Entrar no app":"Continuar"}
+ document.querySelectorAll(".choice-grid").forEach(g=>g.querySelectorAll("button").forEach(b=>b.onclick=()=>{g.querySelectorAll("button").forEach(x=>x.classList.remove("selected"));b.classList.add("selected");answers[g.dataset.question]=b.dataset.value}));
+ $("onPhotoPicker").onclick=()=>{const m=$("photoPrivacyOverlay");m.hidden=false};$("photoPrivacyDeny").onclick=()=>{$("photoPrivacyOverlay").hidden=true};$("photoPrivacyAllow").onclick=()=>{$("photoPrivacyOverlay").hidden=true;$("onPhotoInput").click()};$("onPhotoInput").onchange=e=>{let f=e.target.files[0];if(!f)return;if(f.size>3*1024*1024)return alert("Escolha uma foto de até 3 MB.");let r=new FileReader;r.onload=()=>{photoData=r.result;$("onPhotoPreview").src=photoData;$("onPhotoPreview").style.display="block";$("onPhotoPlaceholder").style.display="none"};r.readAsDataURL(f)};
+ $("onBack").onclick=()=>{if(step){step--;showStep()}};$("onNext").onclick=async()=>{if(step===0&&!$("onName").value.trim())return alert("Digite seu nome.");if(step>=1&&step<=5){let q=["","goal","channel","difficulty","time","style"][step];if(!answers[q])return alert("Selecione uma opção.")}if(step<6){step++;if(step===6){$("onFinishTitle").textContent="Tudo pronto, "+$("onName").value.trim()+"!";$("onFinishText").textContent="Seu foco principal será: "+answers.goal+"."}showStep();return}await saveOnboarding()};
+ function snapshot(){let d={};for(let i=0;i<localStorage.length;i++){let k=localStorage.key(i);if(k&&(k.startsWith("funil_")||k.startsWith("company"))&&!["funil_session_token","funil_username","funil_clean_build","funil_cloud_device_id"].includes(k))d[k]=localStorage.getItem(k)}return d}
+ async function saveOnboarding(){let p={name:$("onName").value.trim(),photo:photoData||null,answers,primary_goal:answers.goal,onboarding_completed:true};try{localStorage.removeItem("funil_company_name");localStorage.removeItem("funil_company_photo");localStorage.removeItem("funil_personalization");await api("save",{profile:p,state:snapshot()});localStorage.setItem("funil_personalization",JSON.stringify(p));if(p.name)localStorage.setItem("funil_company_name",p.name);if(p.photo)localStorage.setItem("funil_company_photo",p.photo);onGate.classList.remove("active");applyProfile(p)}catch(e){alert("Não foi possível salvar agora.")}}
+ function applyProfile(p){localStorage.setItem("funil_personalization",JSON.stringify(p));if(p.name)localStorage.setItem("funil_company_name",p.name);if(p.photo)localStorage.setItem("funil_company_photo",p.photo);if(typeof window.funilRefreshIdentity==="function")window.funilRefreshIdentity();let goal=p.primary_goal||p.answers?.goal;if(goal){let ch=document.querySelector("#desafio-do-dia h2,#desafio-do-dia h3");if(ch&&!ch.dataset.personalized){ch.dataset.personalized="1";let m={"Ganhar dinheiro":"ações que podem gerar vendas","Ganhar seguidores":"crescimento de audiência","Ser reconhecido":"autoridade e marca","Fazer networking":"conexões e parcerias"};let b=document.createElement("div");b.className="personal-goal-banner";b.textContent="🎯 Prioridade: "+(m[goal]||goal);ch.insertAdjacentElement("afterend",b)}}}
+ let timer;let signingOut=false;const old=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){old.call(this,k,v);if(!signingOut&&this===localStorage&&k!=="funil_session_token"&&localStorage.getItem("funil_session_token")){clearTimeout(timer);timer=setTimeout(()=>api("save",{state:snapshot()}).catch(()=>{}),1200)}};
+ const logoutModal=$("funilLogoutModal");
+ $("funilLogoutBtn").addEventListener("click",()=>{logoutModal.hidden=false});
+ $("funilLogoutCancel").addEventListener("click",()=>{logoutModal.hidden=true});
+ logoutModal.addEventListener("click",e=>{if(e.target===logoutModal)logoutModal.hidden=true});
+ $("funilLogoutConfirm").addEventListener("click",()=>{
+   signingOut=true;clearTimeout(timer);
+   // Do not delete server-side data; only clear this device's cached account state.
+   clearAppProfileData();
+   sessionStorage.removeItem("funil_session_token");
+   location.reload();
+ });
+ if(localStorage.getItem("funil_session_token")){hide();await loadAccount()}else show();
+})();
+</script><script id="daily-midnight-refresh-v23">(function(){let last=new Date().toDateString();setInterval(function(){let today=new Date().toDateString();if(today!==last){last=today;location.reload()}},30000);document.addEventListener('visibilitychange',function(){if(!document.hidden&&new Date().toDateString()!==last)location.reload()})})();</script><script id="privacy-legal-v26-js">(function(){const $=id=>document.getElementById(id);$("funilCopyrightYear").textContent=new Date().getFullYear();const pages={privacy:["Política de privacidade","<p>Este aplicativo utiliza nome de usuário, nome de perfil, foto escolhida, respostas do questionário, metas, conquistas e preferências para fornecer e personalizar suas funcionalidades.</p><p>Os dados de conta e perfil podem ser armazenados no serviço de nuvem Supabase. O aparelho também pode manter dados locais para funcionamento e recuperação da experiência.</p><p>O acesso à foto ocorre apenas após sua escolha no seletor do aparelho. A foto escolhida pode ser sincronizada com a conta. Não solicitamos acesso permanente à galeria.</p><p>Para solicitar acesso, correção ou exclusão de informações, escreva para precificafoodsuporte@gmail.com. A solicitação será analisada conforme a legislação aplicável.</p>"],terms:["Termos de uso","<p>O Funil de Vendas disponibiliza orientações e ferramentas de planejamento e marketing. As sugestões são educativas e não garantem aumento de faturamento, seguidores ou resultados específicos.</p><p>Você é responsável pelo uso das estratégias e pelo conteúdo publicado em suas redes sociais. Não compartilhe senhas ou códigos de recuperação.</p><p>O serviço pode depender de internet e provedores externos; recursos podem ficar temporariamente indisponíveis.</p>"],security:["Informações de segurança","<p>O acesso à conta utiliza usuário e senha. O código de recuperação permite redefinir a senha e deve ser guardado em local seguro.</p><p>O aplicativo não precisa receber sua senha por e-mail de suporte. Evite compartilhar códigos, fotos confidenciais ou credenciais.</p><p>Utilize a versão hospedada em HTTPS. A disponibilidade de cópias na nuvem depende da conexão e do serviço de armazenamento.</p>"],cookies:["Dados neste dispositivo","<p>O aplicativo usa armazenamento local do navegador para manter sessão, preferências e parte dos dados de uso. Isso permite recuperar a experiência no mesmo aparelho.</p><p>Apagar os dados do navegador pode remover informações locais e exigir novo login. Para usar em outro celular, entre com o mesmo usuário e senha.</p><p>O aplicativo não declara usar cookies de publicidade nesta versão. Serviços externos podem aplicar seus próprios mecanismos técnicos de sessão.</p>"]};function close(){$("legalModal").hidden=true}document.querySelectorAll("[data-legal]").forEach(b=>b.addEventListener("click",()=>{const p=pages[b.dataset.legal];$("legalModalTitle").textContent=p[0];$("legalModalBody").innerHTML=p[1];$("legalModal").hidden=false}));$("legalClose").onclick=close;$("legalDone").onclick=close;$("legalModal").addEventListener("click",e=>{if(e.target===$("legalModal"))close()})})();</script></body>
+</html>
+
+<style id="disable-old-mini-profile-v9">
+.company-profile-panel{display:none!important}
+body.profile-page-open{overflow-x:hidden}
+</style>
